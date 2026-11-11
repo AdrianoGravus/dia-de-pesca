@@ -21,7 +21,8 @@
     "Confira sempre a regra do pesqueiro para anzol, isca e chicote."
   ];
   var SEM1 = ["D", "S", "T", "Q", "Q", "S", "S"];
-  var FORA = [4]; // horários que não contam na nota do dia: 4 = das 17h às 20h
+  var OCULTOS = [4]; // horários tirados do aplicativo: 4 = das 17h às 20h. Não aparecem nem contam na nota.
+  var FORA = [];     // horários que aparecem, mas não contam na nota do dia
   function conta(k) { return FORA.indexOf(k) < 0; }
   function contadas(v) { return v.filter(function (_, k) { return conta(k); }); }
   function melhorDe(v) { var m = -1; v.forEach(function (x, k) { if (conta(k) && (m < 0 || x > v[m])) m = k; }); return m; }
@@ -133,6 +134,10 @@
   function iniciar() {
     obterPosicao().then(function (pos) { estado.posicao = pos; return carregar(pos); }).then(function (r) {
       estado.dias = M.calcular(r.horario);
+      estado.dias.forEach(function (d) {
+        d.periodos = d.periodos.filter(function (_, k) { return OCULTOS.indexOf(k) < 0; });
+        d.chuvaPesca = d.periodos.reduce(function (s, p) { return s + p.chuva; }, 0);
+      });
       var hoje = hojeISO();
       estado.prox = estado.dias.filter(function (d) { return d.data >= hoje; }).slice(0, 16);
       estado.baixadoEm = r.quando;
@@ -216,31 +221,50 @@
         '<span class="q">' + Math.round(n) + '</span></div>';
     }).join("");
   }
+  /* Explicação da nota do dia: quanto cada componente rendeu no melhor horário, na média das espécies marcadas. */
   function porque(d, r) {
-    var itens = [], p = d.periodos[r.melhor], cfg = estado.cfg.motor, dentro = [], abaixo = [], acima = [];
-    alvos().forEach(function (e) {
-      var tc = p.tCima + cfg.ajusteCima, tf = p.tFundo + cfg.ajusteFundo, t = M.fTermica(tc, e) >= M.fTermica(tf, e) ? tc : tf, nome = curto(e);
-      if (t < e.c1) abaixo.push(nome + " (a partir de " + e.c1 + " °C)"); else if (t > e.c2) acima.push(nome + " (até " + e.c2 + " °C)"); else dentro.push(nome);
+    var cfg = estado.cfg.motor, w = cfg.pesos, p = d.periodos[r.melhor], esp = alvos(), n = esp.length, L = cfg.limites;
+    var tc = p.tCima + cfg.ajusteCima, tf = p.tFundo + cfg.ajusteFundo, ft = 0, luz = 0, dentro = [], abaixo = [], acima = [];
+    esp.forEach(function (e) {
+      ft += M.notaEspecie(p, e, cfg).termica; luz += p.luz[e.grupo];
+      var t = M.fTermica(tc, e) >= M.fTermica(tf, e) ? tc : tf, nome = curto(e).toLowerCase();
+      if (t < e.c1) abaixo.push(nome + " (conforto a partir de " + e.c1 + "\u00a0°C)"); else if (t > e.c2) acima.push(nome + " (conforto até " + e.c2 + "\u00a0°C)"); else dentro.push(nome);
     });
-    itens.push("Água estimada em " + grau(d.cima) + " em cima e " + grau(d.fundo) + " no fundo. Lago " + (d.emCamadas ? "em camadas." : "misturado."));
-    if (dentro.length) itens.push("Na faixa de conforto: " + lista(dentro) + ".");
-    if (abaixo.length) itens.push("Água fria para: " + lista(abaixo) + ".");
-    if (acima.length) itens.push("Água quente para: " + lista(acima) + ".");
-    if (d.tendencia < 0.4) itens.push("A temperatura caiu forte nos últimos dias (ar " + grau(d.quedaAr) + " mais frio, água " + grau(d.quedaAgua) + " mais fria). Isso derruba a nota.");
-    else if (d.tendencia < 0.9) itens.push("Temperatura em queda leve nos últimos dias.");
-    else itens.push("Temperatura estável ou subindo.");
-    if (d.riscoO2 >= 0.3) itens.push("Risco de pouco oxigênio no começo do dia, por calor, dias nublados seguidos ou chuva forte.");
-    var refresco = d.periodos.filter(function (q, k) { return conta(k) && q.sRefresco; }).map(function (q) { return q.nome.toLowerCase(); });
-    var fechou = d.periodos.filter(function (q, k) { return conta(k) && q.sFechou && !q.sRefresco; }).map(function (q) { return q.nome.toLowerCase(); });
-    if (refresco.length) itens.push("Virada do tempo a favor: chuva refrescando o dia quente (" + lista(refresco) + ").");
-    if (fechou.length) itens.push("Virada do tempo a favor: céu fechando depois de sol (" + lista(fechou) + ").");
-    if (p.sPressao >= 0.5) itens.push("Pressão em queda em relação a ontem, sinal de mudança de tempo chegando.");
-    if (p.sPressao <= -0.5) itens.push("Pressão em alta em relação a ontem, típica de depois da frente. Tira pontos.");
-    if (r.fds) itens.push("Fim de semana: desconto de " + cfg.descontoFds + " pontos pelo pesqueiro mais cheio.");
-    var L = cfg.limites;
-    itens.push("O horário das 17h às 20h não conta na nota do dia, na medida nem no melhor horário.");
-    itens.push("Medida do dia: \"" + MEDIDA.bom + "\" quando pelo menos " + L.horariosBons + " horários chegam a " + L.bom + ". \"" + MEDIDA.otimo + "\" quando, além disso, a nota do dia chega a " + L.muitoBom + ". \"" + MEDIDA.fraco + "\" quando nenhum horário chega a " + L.fraco + ". O resto é \"" + MEDIDA.medio + "\".");
-    return '<ul class="porque">' + itens.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul>';
+    var regime = { frio: "Com água fria, as espécies de dia pontuam mais do meio do dia para a tarde.", ameno: "Com água amena, as espécies de dia pontuam bem da manhã à tarde e menos no amanhecer.", quente: "Com calor, as espécies de dia pontuam mais cedo e menos nas horas de sol forte." }[d.regime];
+    var virada = [];
+    if (Math.abs(p.dp24) >= 1) virada.push("A pressão " + (p.dp24 < 0 ? "caiu " : "subiu ") + n1(Math.abs(p.dp24)) + " hPa em relação a ontem. " + (p.dp24 < 0 ? "Queda dá pontos, por indicar mudança de tempo chegando." : "Alta tira pontos, por ser típica de depois da frente."));
+    else virada.push("Pressão parada em relação a ontem.");
+    if (p.sRefresco) virada.push("Chuva refrescando um dia quente dá pontos.");
+    if (p.sFechou) virada.push("Céu fechando depois de sol dá pontos.");
+    if (!p.sRefresco && !p.sFechou) virada.push("Sem chuva refrescando nem céu fechando neste horário. Tempo parado vale metade dos pontos.");
+    var partes = [
+      { nome: "Temperatura da água", max: w.temperatura, v: w.temperatura * ft / n,
+        texto: "Neste horário a água está em " + grau(tc) + " em cima e " + grau(tf) + " no fundo. " + (dentro.length ? "No conforto: " + lista(dentro) + ". " : "") +
+          (abaixo.length ? "Fria para: " + lista(abaixo) + ". " : "") + (acima.length ? "Quente para: " + lista(acima) + ". " : "") + "Cada espécie pontua pela camada que mais lhe serve." + (p.fatorFundo < 1 ? " O fundo perde pontos por pouco oxigênio." : "") },
+      { nome: "Tendência da temperatura", max: w.tendencia, v: w.tendencia * p.tendencia,
+        texto: (d.quedaAr < 0.5 && d.quedaAgua < 0.3) ? "Sem queda de temperatura nos últimos dias." :
+          "O ar ficou " + grau(d.quedaAr) + " mais frio em um ou dois dias e a água de cima " + (d.quedaAgua < 0.3 ? "se manteve" : "perdeu " + grau(d.quedaAgua) + " em três dias") + ". Queda forte faz o peixe parar de comer. Os pontos zeram com 5\u00a0°C de queda no ar ou 3\u00a0°C na água." },
+      { nome: "Oxigênio", max: w.oxigenio, v: w.oxigenio * p.oxigenio,
+        texto: d.riscoO2 < 0.1 ? "Sem sinal de falta de oxigênio." : "Risco de pouco oxigênio estimado em " + Math.round(d.riscoO2 * 100) + "%, por água quente, dias nublados seguidos, falta de vento ou chuva forte. Pesa mais no amanhecer e menos à tarde." },
+      { nome: "Luz e horário", max: w.luz, v: w.luz * luz / n,
+        texto: "Pontos do horário (" + p.nome.toLowerCase() + ") para as espécies marcadas. " + regime + " Peixes de couro e predadores pontuam mais com pouca luz." + (p.nuvens >= 70 ? " O céu nublado deste horário dá um bônus a eles." : "") },
+      { nome: "Virada do tempo", max: w.virada, v: w.virada * p.virada, texto: virada.join(" ") }
+    ];
+    // arredonda as partes de modo que a soma mostrada bata com a nota
+    var alvoSoma = Math.round(r.medias[r.melhor]), base = partes.map(function (x) { return Math.floor(x.v); }), falta = alvoSoma - base.reduce(function (a, b) { return a + b; }, 0);
+    partes.map(function (x, i) { return [x.v - Math.floor(x.v), i]; }).sort(function (a, b) { return b[0] - a[0]; }).forEach(function (f) { if (falta > 0 && base[f[1]] < partes[f[1]].max) { base[f[1]]++; falta--; } });
+    partes.forEach(function (x, i) { x.pts = base[i]; });
+    var pior = partes.slice().sort(function (a, b) { return (b.max - b.v) - (a.max - a.v); })[0];
+    var h = '<p class="sub" style="margin:10px 0 8px">Conta feita no melhor horário (' + p.nome.toLowerCase() + ', das ' + p.faixa + '), na média das ' + n + ' espécies marcadas. A nota vai de 0 a 100 e soma cinco partes.</p>' +
+      partes.map(function (x) {
+        return '<div class="parte"><div class="pl"><b>' + x.nome + '</b><span>' + x.pts + ' de ' + x.max + '</span></div><div class="pb"><i style="width:' + Math.max(2, x.v / x.max * 100).toFixed(0) + '%"></i></div><p>' + esc(x.texto) + '</p></div>';
+      }).join("");
+    var itens = ["Soma das cinco partes: " + Math.round(r.medias[r.melhor]) + "." + (r.fds ? " Fim de semana: menos " + cfg.descontoFds + " pontos pelo pesqueiro mais cheio. Nota do dia: " + Math.round(r.notaDia) + "." : " Sem desconto de fim de semana.")];
+    if (pior.max - pior.v >= 2) itens.push("O que mais tirou pontos: " + pior.nome.toLowerCase() + ", com " + (pior.max - pior.pts) + " a menos que o máximo.");
+    itens.push("Nota de cada horário: " + d.periodos.map(function (q, k) { return q.faixa + " " + Math.round(r.medias[k]); }).join(", ") + ".");
+    itens.push("Medida: \"" + MEDIDA[r.medida] + "\". \"" + MEDIDA.bom + "\" pede pelo menos " + L.horariosBons + " horários com " + L.bom + " ou mais. \"" + MEDIDA.otimo + "\" pede, além disso, nota do dia de " + L.muitoBom + " ou mais. \"" + MEDIDA.fraco + "\" é quando nenhum horário chega a " + L.fraco + ".");
+    itens.push("A nota considera os horários das 5h às 17h. Chuva e vento não entram na nota do peixe.");
+    return h + '<ul class="porque">' + itens.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul>';
   }
   function tabelaTempo(d, per) {
     var cfg = estado.cfg.motor;
@@ -260,8 +284,8 @@
   }
   function previsao(d) {
     var raj = Math.max.apply(null, d.periodos.map(function (p) { return p.rajada; }));
-    return '<section class="cartao"><h2>Previsão do tempo</h2><p class="sub">Mínima de ' + Math.round(d.tmin) + '\u00a0°C e máxima de ' + Math.round(d.tmax) + '\u00a0°C. Chuva no dia: ' +
-      (d.chuva >= 0.5 ? Math.round(d.chuva) + " mm" : "sem chuva") + '. Rajadas de até ' + Math.round(raj) + ' km/h.</p><div class="tempo">' +
+    return '<section class="cartao"><h2>Previsão do tempo</h2><p class="sub">Mínima de ' + Math.round(d.tmin) + '\u00a0°C e máxima de ' + Math.round(d.tmax) + '\u00a0°C. Chuva das 5h às 17h: ' +
+      (d.chuvaPesca >= 0.5 ? Math.round(d.chuvaPesca) + " mm" : "sem chuva") + '. Rajadas de até ' + Math.round(raj) + ' km/h.</p><div class="tempo">' +
       d.periodos.map(function (p, k) {
         var c = ceu(p);
         return '<div' + (conta(k) ? '' : ' class="fora"') + '><span class="h">' + p.faixa.replace("h a ", " a ") + '</span><span class="c" role="img" aria-label="' + c[1] + '">' + c[0] + '</span><span class="g">' + Math.round(p.tempAr) + '°</span>' +
@@ -326,7 +350,7 @@
     var d = diaSel(), r = estado.res[d.data], per = estado.per === null ? r.melhor : estado.per, p = d.periodos[per];
     var escolhidas = alvos();
     var bons = escolhidas.filter(function (e) { return r.ver[e.id] === "bom" || r.ver[e.id] === "otimo"; }).map(curto), fracos = escolhidas.filter(function (e) { return r.ver[e.id] === "fraco"; }).map(curto);
-    var chuvaDia = d.chuva >= 1 ? " Chuva prevista: " + Math.round(d.chuva) + " mm." : "";
+    var chuvaDia = d.chuvaPesca >= 1 ? " Chuva das 5h às 17h: " + Math.round(d.chuvaPesca) + " mm." : "";
     var h = cabecalho("dias") + '<main class="pagina">' + avisos() + '<div class="grade"><div class="col-a">' +
       '<section class="medida ' + r.medida + '"><div class="data">' + tituloDia(d) + '</div><div class="linha"><div class="palavra">' + MEDIDA[r.medida] + '</div><div class="num">' + Math.round(r.notaDia) + '<small>nota do dia</small></div></div>' +
       '<p>Melhor horário: <b>' + d.periodos[r.melhor].nome.toLowerCase() + ', das ' + d.periodos[r.melhor].faixa + '</b>.' + chuvaDia + '</p>' +
@@ -336,7 +360,7 @@
       grafico(function (x, rr) { return rr.notaDia; }, function (x, rr) { return rr.medida; }) + '</section>' +
       '<section class="cartao estrategia"><h2>Estratégia para o dia</h2><p class="sub">Montada com a previsão e as notas deste dia.</p><ul class="porque" style="margin-top:0">' +
       estrategia(d, r).map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ul></section></div>' +
-      '<div class="col-b"><section class="cartao"><h2>Onde os peixes devem estar</h2><p class="sub">Escolha o horário. A estrela marca o melhor do dia. O das 17h às 20h aparece, mas não conta na nota.</p>' +
+      '<div class="col-b"><section class="cartao"><h2>Onde os peixes devem estar</h2><p class="sub">Escolha o horário. A estrela marca o melhor do dia.</p>' +
       horarios(d, r.medias, r.melhor, per) + colunaAgua(d, r, per) + '</section>' +
       '<section class="cartao"><h2>Nota por espécie, ' + p.nome.toLowerCase() + '</h2><p class="sub">O círculo marca as espécies que contam na nota do dia. Toque no nome para ver iscas e montagens.</p>' + listaEspecies(d, r, per) + '</section></div>' +
       '<div class="col-c"><details class="cartao"><summary>Estratégias que valem para qualquer dia</summary><ul class="porque">' + GERAIS.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") +

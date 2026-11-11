@@ -80,7 +80,7 @@ h2 { font-size: 1.35rem; margin-bottom: 8px; }
 .grafico .s i { font-style: normal; } .grafico .s .l3 { display: none; }
 @media (min-width: 600px) { .grafico .s .l1 { display: none; } .grafico .s .l3 { display: inline; } }
 .horarios .fora { opacity: .55; border-style: dashed; }
-.tempo { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; text-align: center; }
+.tempo { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 4px; text-align: center; }
 .tempo > div { background: #F3F6F5; border-radius: 10px; padding: 8px 2px; }
 .tempo > div.fora { opacity: .55; }
 .tempo span { display: block; line-height: 1.25; }
@@ -94,7 +94,7 @@ h2 { font-size: 1.35rem; margin-bottom: 8px; }
 .legenda .medio { background: var(--boia); } .legenda .fraco { background: var(--ferrugem); }
 
 /* horários */
-.horarios { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 12px; }
+.horarios { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 5px; margin-bottom: 12px; }
 .horarios button { background: var(--papel); border: 1.5px solid var(--linha); border-radius: 10px; padding: 6px 2px; min-height: 58px; }
 .horarios .h { display: block; font-size: 0.74rem; color: var(--tinta-fraca); }
 .horarios .q { display: block; font-family: var(--titulo); font-weight: 700; font-size: 1.5rem; line-height: 1.05; }
@@ -137,6 +137,10 @@ h2 { font-size: 1.35rem; margin-bottom: 8px; }
 .selo.medio { background: var(--boia); color: var(--tinta); } .selo.fraco { background: var(--ferrugem); }
 
 details.cartao summary { font-family: var(--titulo); font-weight: 700; font-size: 1.2rem; cursor: pointer; }
+.parte { margin: 0 0 12px; } .parte p { margin: 4px 0 0; font-size: 0.9rem; }
+.parte .pl { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.parte .pl b { font-weight: 600; } .parte .pl span { font-family: var(--titulo); font-weight: 700; font-size: 1.15rem; white-space: nowrap; }
+.parte .pb { height: 8px; border-radius: 4px; background: #E3EAE6; margin-top: 3px; overflow: hidden; } .parte .pb i { display: block; height: 100%; background: var(--lago); border-radius: 4px; }
 .porque { margin: 10px 0 0; padding-left: 20px; } .porque li { margin: 5px 0; }
 .rolagem { overflow-x: auto; margin-top: 10px; }
 table { border-collapse: collapse; width: 100%; font-size: 0.86rem; table-layout: fixed; }
