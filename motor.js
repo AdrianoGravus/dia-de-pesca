@@ -26,19 +26,29 @@
   };
   // zero inferior, conforto de, conforto ate, zero superior (graus C)
   var ESPECIES = [
-    { id: "carpas", nome: "Carpas", z1: 4, c1: 20, c2: 28, z2: 32, grupo: "diurnos", alvo: true, provisorio: false },
+    { id: "carpacomum", nome: "Carpa comum", z1: 4, c1: 20, c2: 28, z2: 32, grupo: "diurnos", alvo: true, provisorio: false },
+    { id: "carpacabecuda", nome: "Carpa cabeçuda", z1: 6, c1: 20, c2: 29, z2: 33, grupo: "diurnos", alvo: false, provisorio: true },
+    { id: "carpacapim", nome: "Carpa capim", z1: 8, c1: 20, c2: 28, z2: 32, grupo: "diurnos", alvo: false, provisorio: true },
     { id: "jundia", nome: "Jundiá", z1: 6, c1: 18, c2: 28, z2: 32, grupo: "couro", alvo: false, provisorio: true },
-    { id: "traira", nome: "Dourado e traíra", z1: 6, c1: 18, c2: 28, z2: 32, grupo: "predadores", alvo: false, provisorio: true },
-    { id: "catfish", nome: "Catfish americano", z1: 8, c1: 20, c2: 30, z2: 34, grupo: "couro", alvo: false, provisorio: true },
+    { id: "dourado", nome: "Dourado", z1: 8, c1: 20, c2: 28, z2: 32, grupo: "predadores", alvo: false, provisorio: true },
+    { id: "traira", nome: "Traíra", z1: 6, c1: 18, c2: 28, z2: 32, grupo: "predadores", alvo: false, provisorio: true },
+    { id: "catfish", nome: "Catfish americano", z1: 8, c1: 20, c2: 30, z2: 34, grupo: "couro", alvo: false, provisorio: false },
     { id: "tilapia", nome: "Tilápia", z1: 12, c1: 20, c2: 32, z2: 36, grupo: "diurnos", alvo: true, provisorio: false },
-    { id: "matrinxa", nome: "Matrinxã, piraputanga e piau", z1: 14, c1: 22, c2: 30, z2: 34, grupo: "predadores", alvo: false, provisorio: true },
+    { id: "matrinxa", nome: "Matrinxã", z1: 15, c1: 23, c2: 30, z2: 34, grupo: "predadores", alvo: false, provisorio: false },
+    { id: "piraputanga", nome: "Piraputanga", z1: 14, c1: 22, c2: 30, z2: 34, grupo: "predadores", alvo: false, provisorio: true },
+    { id: "piau", nome: "Piau e piauçu", z1: 14, c1: 22, c2: 30, z2: 34, grupo: "diurnos", alvo: false, provisorio: true },
     { id: "pacu", nome: "Pacu", z1: 15, c1: 23, c2: 29, z2: 33, grupo: "diurnos", alvo: true, provisorio: false },
-    { id: "tambacu", nome: "Tambacu", z1: 16, c1: 24, c2: 31, z2: 35, grupo: "diurnos", alvo: true, provisorio: true },
-    { id: "pintado", nome: "Pintado, cachara e híbridos", z1: 16, c1: 24, c2: 30, z2: 34, grupo: "couro", alvo: true, provisorio: false },
+    { id: "tambacu", nome: "Tambacu", z1: 16, c1: 24, c2: 31, z2: 35, grupo: "diurnos", alvo: true, provisorio: false },
+    { id: "patinga", nome: "Patinga", z1: 16, c1: 24, c2: 30, z2: 34, grupo: "diurnos", alvo: false, provisorio: true },
+    { id: "pintado", nome: "Pintado", z1: 16, c1: 24, c2: 30, z2: 34, grupo: "couro", alvo: true, provisorio: false },
+    { id: "cachara", nome: "Cachara", z1: 16, c1: 24, c2: 30, z2: 34, grupo: "couro", alvo: false, provisorio: false },
+    { id: "cachapira", nome: "Cachapira e pintado-amazônico", z1: 17, c1: 25, c2: 31, z2: 35, grupo: "couro", alvo: false, provisorio: true },
     { id: "tambaqui", nome: "Tambaqui", z1: 17, c1: 25, c2: 34, z2: 38, grupo: "diurnos", alvo: true, provisorio: false },
-    { id: "pirapitinga", nome: "Pirapitinga, patinga e tambatinga", z1: 17, c1: 25, c2: 32, z2: 36, grupo: "diurnos", alvo: false, provisorio: true },
+    { id: "pirapitinga", nome: "Pirapitinga", z1: 17, c1: 25, c2: 32, z2: 36, grupo: "diurnos", alvo: false, provisorio: false },
+    { id: "tambatinga", nome: "Tambatinga", z1: 17, c1: 25, c2: 33, z2: 37, grupo: "diurnos", alvo: false, provisorio: true },
     { id: "pirarara", nome: "Pirarara", z1: 17, c1: 25, c2: 32, z2: 36, grupo: "couro", alvo: false, provisorio: true },
-    { id: "pirarucu", nome: "Pirarucu e tucunaré", z1: 17, c1: 25, c2: 32, z2: 36, grupo: "predadores", alvo: false, provisorio: true }
+    { id: "tucunare", nome: "Tucunaré", z1: 17, c1: 24, c2: 31, z2: 35, grupo: "predadores", alvo: false, provisorio: false },
+    { id: "pirarucu", nome: "Pirarucu", z1: 18, c1: 24, c2: 31, z2: 35, grupo: "predadores", alvo: false, provisorio: true }
   ];
   var CONFIG_PADRAO = {
     pesos: { temperatura: 40, tendencia: 15, oxigenio: 20, luz: 15, virada: 10 },
@@ -218,6 +228,15 @@
     if (zona === "raso") {
       if (frio) return { faixa: "fundo", texto: "Água fria para a espécie: peixe lento, mais fundo e dentro das estruturas. Isca devagar." };
       return { faixa: "raso", texto: "Raso, junto de margens, vegetação, troncos e sombra." };
+    }
+    if (zona === "meia") { // filtradores de meia-água, como a carpa cabeçuda
+      if (frio) return { faixa: "fundo", texto: "Água fria para a espécie: mais fundo, com chuveirinho de fundo." };
+      return { faixa: "meia", texto: "Meia-água, com chuveirinho suspenso por boia." };
+    }
+    if (zona === "caca") { // predadores de água aberta
+      if (frio) return { faixa: "meia", texto: "Água fria para a espécie: peixe lento e mais fundo. Isca trabalhada devagar, na meia-água ou perto do fundo." };
+      if (quente) return { faixa: "meia", texto: "Água de cima quente demais: meia-água nas horas de sol, superfície cedo." };
+      return { faixa: "sup", texto: "Superfície e meia-água, com isca em movimento." };
     }
     if (zona === "fundo") {
       if (fundoRuim) return { faixa: "meia", texto: "Fundo das partes mais rasas, até uns 2 m. Na parte mais funda o fundo deve estar com pouco oxigênio." };

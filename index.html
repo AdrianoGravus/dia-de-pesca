@@ -57,14 +57,15 @@ h2 { font-size: 1.35rem; margin-bottom: 8px; }
 /* medida do dia */
 .medida { border-radius: 16px; padding: 16px; margin-bottom: 14px; color: var(--tinta); background: var(--bom); position: relative; overflow: hidden; }
 .medida.otimo { background: var(--otimo); color: #fff; }
-.medida .palavra { white-space: nowrap; }
-.medida.otimo .palavra::after { content: " ★"; color: var(--boia); font-size: .6em; vertical-align: .15em; }
+.medida .linha > .palavra { flex: 1 1 auto; min-width: 0; }
+.medida .linha > .num { flex: none; }
+.medida.otimo .palavra::after { content: "\00a0★"; color: var(--boia); font-size: .6em; vertical-align: .15em; }
 .medida.fraco { color: #fff; }
 .medida.medio { background: var(--boia); color: var(--tinta); }
 .medida.fraco { background: var(--ferrugem); }
 .medida .data { font-size: 0.95rem; opacity: .92; }
 .medida .linha { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 2px; }
-.medida .palavra { font-family: var(--titulo); font-weight: 700; font-size: 3rem; line-height: 0.95; letter-spacing: 0.005em; }
+.medida .palavra { font-family: var(--titulo); font-weight: 700; font-size: clamp(2.1rem, 11vw, 3rem); line-height: 0.95; letter-spacing: 0.005em; }
 .medida .num { font-family: var(--titulo); font-weight: 700; font-size: 3.6rem; line-height: 0.85; }
 .medida .num small { display: block; font-family: Barlow, sans-serif; font-weight: 400; font-size: 0.72rem; text-align: right; margin-top: 4px; opacity: .9; }
 .medida p { margin: 10px 0 0; font-size: 0.95rem; }
@@ -185,8 +186,8 @@ td.sel, th.sel { background: #E9F1EE; font-weight: 600; }
 </head>
 <body>
 <div id="app"><header class="topo"><div class="dentro"><div class="marca"><h1>Dia de Pesca</h1></div><div class="abas"></div></div></header><main class="pagina"><p class="carregando">Buscando a previsão do tempo.</p></main></div>
-<script src="motor.js?v=7"></script>
-<script src="dicas.js?v=7"></script>
-<script src="app.js?v=7"></script>
+<script src="motor.js?v=8"></script>
+<script src="dicas.js?v=8"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

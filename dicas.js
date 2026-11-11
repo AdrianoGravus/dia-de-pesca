@@ -22,19 +22,35 @@
   };
   /* porDia: iscas por situação. Chaves: sup, meia, fundo e raso (faixa sugerida), dificil (dia fraco ou água esfriando) e padrao. */
   var D = {
-    carpas: {
-      porDia: { padrao: ["massa no fundo", "milho", "pastilha no chuveirinho de meia-água, para a cabeçuda", "pão ou vegetais, para a capim"], dificil: ["massa no fundo", "milho", "pastilha no chuveirinho de fundo, para a cabeçuda"] },
-      habito: "Carpa comum e húngara comem no fundo. A cabeçuda filtra plâncton e fica na meia-água. A capim é herbívora e não come ração.",
+    carpacomum: {
+      habito: "Carpa comum, húngara e espelho. Onívora, come no fundo. É a espécie da lista que menos sente a água fria.",
       zona: "fundo",
-      iscas: ["Massa, pastilhas e milho", "Cabeçuda: pastilha que se dissolve devagar e forma uma nuvem em volta dos anzóis", "Capim: vegetais e pão"],
-      montagens: [
-        "Comum e húngara: pesca de fundo com massa.",
-        "Cabeçuda: chuveirinho (vários anzóis em volta de uma mola que segura a massa ou a pastilha), suspenso na meia-água com boia. O stop na linha regula a altura.",
-        "Em ponto mais fundo, chuveirinho de fundo."
-      ],
+      iscas: ["Massa", "Milho", "Pastilhas"],
+      montagens: ["Pesca de fundo com massa.", "Chuveirinho de fundo com massa."],
       linha: "Não achei bitola específica nas fontes. Vale a regra do pesqueiro.",
-      dicas: ["No frio a carpa come em janelas curtas, em geral no fim da tarde.", "É a espécie da lista que menos sente a água fria."],
-      fonte: "boa"
+      dicas: ["No frio a carpa come em janelas curtas, em geral no fim da tarde.", "Melhor crescimento entre 20 e 28 °C. Só para de comer perto de 4 °C."],
+      fonte: "boa",
+      porDia: { padrao: ["massa no fundo", "milho", "pastilha"], dificil: ["massa no fundo", "milho"] }
+    },
+    carpacabecuda: {
+      habito: "Carpa de cabeça grande. Filtra zooplâncton e fica na meia-água. Não ataca isca comum: é pega com a nuvem de massa em volta dos anzóis.",
+      zona: "meia",
+      iscas: ["Pastilha de dissolução lenta, que forma uma nuvem em volta dos anzóis", "Massa fina própria para cabeçuda"],
+      montagens: ["Chuveirinho (vários anzóis em volta de uma mola que segura a pastilha), suspenso na meia-água com boia. O stop na linha regula a altura.", "Em ponto mais fundo, chuveirinho de fundo."],
+      linha: "Não achei bitola nas fontes.",
+      dicas: ["O que atrai é a nuvem de partículas, não o cheiro forte.", "Ajuste a altura do chuveirinho até achar a camada onde o cardume está.", "Faixa de temperatura estimada pelas outras carpas."],
+      fonte: "boa",
+      porDia: { padrao: ["pastilha no chuveirinho de meia-água", "massa fina para cabeçuda"], dificil: ["pastilha no chuveirinho de fundo"] }
+    },
+    carpacapim: {
+      habito: "Herbívora. Come plantas e capim, não ração. Tolera grande variação de temperatura, mas a atividade cai bastante no outono e no inverno.",
+      zona: "coluna",
+      iscas: ["Vegetais e capim", "Pão", "Milho"],
+      montagens: ["Boia com pão ou vegetal na superfície.", "No frio, isca vegetal no fundo."],
+      linha: "Não achei bitola nas fontes.",
+      dicas: ["Temperatura ideal de crescimento perto de 24 °C.", "Pouca fonte de pesqueiro. Trate como ponto de partida."],
+      fonte: "pouca",
+      porDia: { sup: ["pão na boia", "folhas ou capim", "milho"], padrao: ["pão", "milho", "vegetais no fundo"] }
     },
     jundia: {
       porDia: { padrao: ["minhoca ou minhocuçu", "coração de frango", "isca de cheiro forte"] },
@@ -46,15 +62,25 @@
       dicas: ["Dicas emprestadas dos outros bagres. Achei pouca coisa específica de jundiá em pesqueiro."],
       fonte: "pouca"
     },
+    dourado: {
+      habito: "Carnívoro de hábito diurno, de água aberta. Ataca na superfície. É espécie da bacia do Prata e resiste ao frio do Sul.",
+      zona: "caca",
+      iscas: ["Iscas artificiais de superfície e de meia-água", "Peixes pequenos", "Coração de frango"],
+      montagens: ["Artificial recolhida com velocidade, na superfície ou logo abaixo.", "Isca natural na meia-água, com boia."],
+      linha: "Em pesquisa com pescadores de isca artificial, a maioria prefere multifilamento. Empate resistente a dente é prática comum, sem fonte para a bitola.",
+      dicas: ["Rende mais com luz baixa e água movimentada, perto da entrada de água ou do aerador.", "Pouca fonte específica de pesqueiro. Faixa de temperatura provisória."],
+      fonte: "pouca",
+      porDia: { sup: ["artificial de superfície", "artificial de meia-água", "peixe pequeno na boia"], padrao: ["artificial de meia-água trabalhada devagar", "peixe pequeno", "coração de frango"] }
+    },
     traira: {
-      porDia: { raso: ["artificial de superfície (zara ou popper)", "soft antienrosco", "lambari ou tuvira"], padrao: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"], dificil: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"] },
-      habito: "Traíra: predador de emboscada, fica em margens com vegetação, troncos e sombra. Dourado: carnívoro de hábito diurno, ataca na superfície.",
+      habito: "Predador de emboscada. Fica em margens com vegetação densa, troncos submersos e sombra. Resiste bem ao frio.",
       zona: "raso",
-      iscas: ["Traíra, artificiais: superfície (zara, popper, stick), soft com anzol offset para não enroscar", "Traíra, naturais: tuvira, lambari, minhocuçu, pedaço de carne fresca", "Dourado: iscas de superfície"],
+      iscas: ["Artificiais de superfície (zara, popper, stick)", "Soft com anzol offset, para não enroscar", "Tuvira, lambari, minhocuçu e pedaço de carne fresca"],
       montagens: ["Artificial arremessada rente à vegetação e às estruturas.", "Soft antienrosco trabalhada devagar no fundo quando o peixe não sobe."],
-      linha: "Em pesquisa com pescadores de isca artificial, a maioria prefere multifilamento. Empate resistente a dente é prática comum, mas não achei fonte para a bitola.",
-      dicas: ["Iscas de superfície rendem mais no começo da manhã e no fim da tarde.", "Quando a temperatura cai, a traíra fica lenta e desce para o fundo ou entra nas estruturas."],
-      fonte: "boa"
+      linha: "Em pesquisa com pescadores de isca artificial, a maioria prefere multifilamento. Empate resistente a dente é prática comum, sem fonte para a bitola.",
+      dicas: ["Iscas de superfície rendem mais no começo da manhã e no fim da tarde.", "Quando a temperatura cai, fica lenta e desce para o fundo ou entra nas estruturas."],
+      fonte: "boa",
+      porDia: { raso: ["artificial de superfície (zara ou popper)", "soft antienrosco", "lambari ou tuvira"], padrao: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"], dificil: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"] }
     },
     catfish: {
       porDia: { padrao: ["fígado de galinha", "coração de frango ou de boi", "minhoca", "massa de cheiro forte", "salsicha"] },
@@ -82,14 +108,34 @@
       fonte: "boa"
     },
     matrinxa: {
-      porDia: { padrao: ["ração", "coração de frango", "milho"], dificil: ["coração de frango", "milho"] },
-      habito: "Peixes de escama ativos, de superfície e meia-água.",
+      habito: "Peixe de escama amazônico, ativo, de superfície e meia-água. Tolera de 18 a 36 °C. A 12 °C morre.",
       zona: "coluna",
-      iscas: ["Ração", "Coração de frango", "Milho, para piau e piraputanga", "Matrinxã: pequenas iscas artificiais (spinner e plug pequeno)"],
-      montagens: ["Boia com isca na superfície ou na meia-água."],
+      iscas: ["Ração", "Coração de frango", "Milho", "Pequenas iscas artificiais (spinner e plug pequeno)"],
+      montagens: ["Boia com isca na superfície ou na meia-água.", "Artificial pequena recolhida rápido."],
       linha: "Sem bitola nas fontes.",
-      dicas: ["Achei pouca coisa específica destas espécies em pesqueiro. Trate como ponto de partida."],
+      porDia: { padrao: ["ração", "coração de frango", "milho"], dificil: ["coração de frango", "milho"] },
+      dicas: ["Faixa ideal de criação entre 25 e 28 °C. Abaixo disso come menos.", "Se faltar oxigênio, sobe para respirar na camada de cima e não come."],
       fonte: "pouca"
+    },
+    piraputanga: {
+      habito: "Parente da matrinxã, do Pantanal. Onívora, come frutos e insetos na superfície.",
+      zona: "coluna",
+      iscas: ["Ração", "Coração de frango", "Milho", "Pequenas iscas artificiais (spinner e plug pequeno)"],
+      montagens: ["Boia com isca na superfície ou na meia-água.", "Artificial pequena recolhida rápido."],
+      linha: "Sem bitola nas fontes.",
+      porDia: { padrao: ["ração", "coração de frango", "milho"], dificil: ["coração de frango", "milho"] },
+      dicas: ["Não achei faixa de temperatura própria. Usei a da matrinxã com um pouco mais de tolerância ao frio.", "Pouca fonte de pesqueiro."],
+      fonte: "pouca"
+    },
+    piau: {
+      habito: "Piau e piauçu. Onívoros, comem perto do fundo e na meia-água. O piauçu é da bacia do Paraguai e come mais conforme a água esquenta.",
+      zona: "fundo",
+      iscas: ["Milho", "Massa", "Minhoca", "Coração de frango"],
+      montagens: ["Pesca de fundo ou de meia-água com anzol pequeno."],
+      linha: "Sem bitola nas fontes. Peixe de boca pequena: anzol pequeno.",
+      dicas: ["Belisca a isca. Use dois grãos de milho cobrindo todo o anzol.", "Temperatura de criação indicada perto de 27 °C. Faixa provisória."],
+      fonte: "pouca",
+      porDia: { padrao: ["milho", "massa", "minhoca"], dificil: ["minhoca", "milho"] }
     },
     pacu: {
       habito: "Onívoro. É o mais tolerante ao frio entre os redondos.",
@@ -105,15 +151,42 @@
       dicas: ["Boia na superfície quando o peixe sobe, em dia quente.", "Em dia ruim, fundo ou meia-água, com isca de cheiro (fígado, tilápia)."],
       fonte: "boa"
     },
+    patinga: {
+      habito: "Híbrido de pacu com pirapitinga. Fica entre os dois na tolerância ao frio.",
+      zona: "coluna",
+      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
+      dicas: ["Use as mesmas montagens dos outros redondos.", "Há relatos de mortandade de patinga com água a 12 °C ou menos. Faixa de temperatura provisória."],
+      fonte: "pouca"
+    },
     pintado: {
       porDia: { padrao: ["tilápia em postas ou cabeça", "peixes pequenos", "fígado"] },
-      habito: "Predadores de fundo. Caçam mais com pouca luz.",
+      habito: "Surubim de pintas. Predador de fundo, caça mais com pouca luz. Conforto de 24 a 30 °C.",
       zona: "fundo",
       iscas: ["Peixes pequenos e pedaços de peixe", "Tilápia em postas ou cabeça", "Fígado e iscas de cheiro forte"],
       montagens: ["Pesca de fundo com chumbada solta e isca natural."],
       linha: "Líder de fluorocarbono é citado para a linha não ser cortada. Sem bitola nas fontes.",
       dicas: ["Amanhecer e entardecer são os melhores horários. De dia, céu fechado ajuda."],
       fonte: "boa"
+    },
+    cachara: {
+      habito: "Surubim de listras. Predador de fundo, caça mais com pouca luz. Mesma faixa de conforto do pintado, de 24 a 30 °C.",
+      zona: "fundo",
+      iscas: ["Peixes pequenos e pedaços de peixe", "Tilápia em postas ou cabeça", "Fígado e iscas de cheiro forte"],
+      montagens: ["Pesca de fundo com chumbada solta e isca natural."],
+      linha: "Líder de fluorocarbono é citado para a linha não ser cortada. Sem bitola nas fontes.",
+      porDia: { padrao: ["tilápia em postas ou cabeça", "peixes pequenos", "fígado"] },
+      dicas: ["Amanhecer e céu fechado são os melhores momentos entre 5h e 17h."],
+      fonte: "boa"
+    },
+    cachapira: {
+      habito: "Híbridos de surubim com bagres amazônicos (cachara com pirarara, cachara com jundiá-da-amazônia). Predadores de fundo, sensíveis ao frio.",
+      zona: "fundo",
+      iscas: ["Peixes pequenos e pedaços de peixe", "Tilápia em postas ou cabeça", "Fígado e iscas de cheiro forte"],
+      montagens: ["Pesca de fundo com chumbada solta e isca natural."],
+      linha: "Líder de fluorocarbono é citado para a linha não ser cortada. Sem bitola nas fontes.",
+      porDia: { padrao: ["tilápia em postas ou cabeça", "peixes pequenos", "fígado"] },
+      dicas: ["Há relatos de mortandade do pintado-amazônico com água a 12 °C ou menos. Em água fria quase não come.", "Faixa de temperatura provisória, puxada para o lado amazônico."],
+      fonte: "pouca"
     },
     tambaqui: {
       habito: "Onívoro amazônico. Precisa de água quente e tolera pouco oxigênio.",
@@ -123,10 +196,17 @@
       fonte: "boa"
     },
     pirapitinga: {
-      habito: "Redondos de origem amazônica e seus híbridos. Sentem bastante o frio.",
+      habito: "Redondo amazônico. Conforto de 25 a 32 °C. Sente bastante o frio.",
       zona: "coluna",
       iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
-      dicas: ["Use as mesmas montagens dos outros redondos.", "Faixa de temperatura da pirapitinga. Para os híbridos é uma aproximação."],
+      dicas: ["Use as mesmas montagens dos outros redondos.", "Em São Bernardo, só em dias quentes."],
+      fonte: "boa"
+    },
+    tambatinga: {
+      habito: "Híbrido de tambaqui com pirapitinga. Os dois pais são amazônicos: é peixe de água quente.",
+      zona: "coluna",
+      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
+      dicas: ["Use as mesmas montagens dos outros redondos.", "Em São Bernardo, só em dias quentes. Faixa de temperatura provisória."],
       fonte: "pouca"
     },
     pirarara: {
@@ -139,15 +219,25 @@
       dicas: ["Dê tempo para o peixe engolir a isca antes de fisgar.", "Depois da fisgada, pressione logo para ele não levar a linha para as estruturas.", "Faixa de temperatura estimada pela origem amazônica."],
       fonte: "boa"
     },
-    pirarucu: {
-      porDia: { padrao: ["isca viva ou natural, se o pesqueiro permitir", "artificial de superfície ou de meia-água, para o tucunaré"] },
-      habito: "Pirarucu sobe para respirar na superfície. Tucunaré é predador de estrutura.",
+    tucunare: {
+      habito: "Predador diurno de estrutura, de origem amazônica. Ótimo perto de 28 °C. Perto de 15 °C morre.",
       zona: "raso",
-      iscas: ["Pirarucu: isca viva ou natural, conforme a regra do pesqueiro", "Tucunaré: iscas artificiais de superfície e de meia-água, e soft"],
-      montagens: ["Tucunaré: artificial trabalhada perto de estruturas."],
+      iscas: ["Iscas artificiais de superfície e de meia-água", "Jig e soft", "Peixe pequeno, se o pesqueiro permitir"],
+      montagens: ["Artificial trabalhada perto de estruturas e margens."],
       linha: "Sem bitola nas fontes.",
-      dicas: ["Achei pouca coisa específica de pesqueiro. Trate como ponto de partida.", "Faixa de temperatura estimada pela origem amazônica."],
-      fonte: "pouca"
+      dicas: ["Frente fria derruba a atividade. Depois de dias quentes seguidos, volta a atacar.", "Pouca fonte específica de pesqueiro."],
+      fonte: "pouca",
+      porDia: { raso: ["artificial de superfície", "artificial de meia-água", "jig"], padrao: ["jig ou soft devagar", "artificial de meia-água"], dificil: ["jig ou soft devagar", "peixe pequeno, se permitido"] }
+    },
+    pirarucu: {
+      habito: "Gigante amazônico. Sobe à superfície para respirar. Precisa de água entre 22 e 30 °C.",
+      zona: "caca",
+      iscas: ["Isca viva ou natural (peixe), conforme a regra do pesqueiro", "Ração, em lagos onde é tratado com ela"],
+      montagens: ["Isca natural com boia, perto de onde o peixe sobe para respirar."],
+      linha: "Equipamento reforçado. Sem bitola nas fontes.",
+      dicas: ["Observe onde ele boia para respirar e arremesse perto.", "Em São Bernardo a água fica fria para ele boa parte do ano. Faixa de temperatura provisória."],
+      fonte: "pouca",
+      porDia: { padrao: ["peixe vivo ou em pedaços, se o pesqueiro permitir", "ração, se for o trato do lago"] }
     }
   };
   var api = { POR_ESPECIE: D };

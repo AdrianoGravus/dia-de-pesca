@@ -38,11 +38,17 @@
   function gravar(chave, v) { try { localStorage.setItem(chave, JSON.stringify(v)); } catch (e) { /* sem armazenamento: segue sem guardar */ } }
   function lerCfg() {
     var c = ler("pesca.cfg") || {};
+    var ANTIGOS = { carpas: ["carpacomum", "carpacabecuda", "carpacapim"], traira: ["traira", "dourado"], matrinxa: ["matrinxa", "piraputanga", "piau"],
+      pintado: ["pintado", "cachara", "cachapira"], pirapitinga: ["pirapitinga", "patinga", "tambatinga"], pirarucu: ["pirarucu", "tucunare"] };
+    if (Array.isArray(c.alvos) && !c.separadas) { // versão antiga, com espécies agrupadas
+      var novo = []; c.alvos.forEach(function (id) { (ANTIGOS[id] || [id]).forEach(function (x) { if (novo.indexOf(x) < 0) novo.push(x); }); });
+      c.alvos = novo;
+    }
     return { alvos: Array.isArray(c.alvos) ? c.alvos : M.ESPECIES.filter(function (e) { return e.alvo; }).map(function (e) { return e.id; }), motor: M.CONFIG_PADRAO };
   }
   estado.local = ler("pesca.local") || { modo: "gps" };   // "gps" ou "fixo" (pesqueiro escolhido na busca)
   function locaisRecentes() { var l = ler("pesca.locais"); return Array.isArray(l) ? l : []; }
-  function salvarCfg() { gravar("pesca.cfg", { alvos: estado.cfg.alvos }); }
+  function salvarCfg() { gravar("pesca.cfg", { alvos: estado.cfg.alvos, separadas: true }); }
 
   // ---------- utilidades
   function hojeISO() {
