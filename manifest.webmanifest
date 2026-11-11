@@ -1,0 +1,17 @@
+{
+  "name": "Dia de Pesca",
+  "short_name": "Dia de Pesca",
+  "description": "Escolha do melhor dia e horário para pescar em pesqueiro, com nota por espécie.",
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF3F1",
+  "theme_color": "#0F5C4D",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icone-mascara-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B3B36">
+<title>Dia de Pesca</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icone-192.png">
+<style>
+@font-face { font-family: "Barlow"; font-weight: 400; font-display: swap; src: url("fontes/barlow-400.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("fontes/barlow-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; font-display: swap; src: url("fontes/barlow-condensed-600.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 700; font-display: swap; src: url("fontes/barlow-condensed-700.woff2") format("woff2"); }
+:root {
+  --nevoa: #EEF3F1; --papel: #FFFFFF; --tinta: #14261F; --tinta-fraca: #52655D; --linha: #C9D5CF;
+  --funda: #0B3B36;   /* água funda: cabeçalho */
+  --otimo: #0B4A3E;   /* muito bom */
+  --lago: #0F5C4D;    /* cor principal */
+  --bom: #86CDB0;     /* vale ir */
+  --boia: #F4C20D;    /* dia médio e destaques */
+  --ferrugem: #A8452F;/* não vale a pena */
+  --chuva: #2E6FB7;
+  --titulo: "Barlow Condensed", "Arial Narrow", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--nevoa); color: var(--tinta); font-family: Barlow, Roboto, "Segoe UI", system-ui, sans-serif; font-size: 16px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--boia); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--titulo); font-weight: 700; margin: 0; line-height: 1.1; }
+h2 { font-size: 1.35rem; margin-bottom: 8px; }
+.sub { margin: -4px 0 10px; font-size: 0.86rem; color: var(--tinta-fraca); }
+
+/* cabeçalho */
+.topo { background: var(--funda); color: #fff; }
+.topo .dentro { max-width: 1120px; margin: 0 auto; padding: 12px 14px 0; }
+.marca { display: flex; align-items: center; gap: 10px; }
+.marca svg { width: 30px; height: 30px; flex: none; }
+.marca h1 { font-size: 1.7rem; letter-spacing: 0.01em; }
+.local { margin-top: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 0.88rem; color: #CFE3DD; }
+.local button { background: transparent; border: 1px solid rgba(255,255,255,.5); color: #fff; border-radius: 999px; padding: 3px 12px; min-height: 30px; font-size: 0.82rem; }
+.abas { display: flex; gap: 4px; margin-top: 12px; }
+.abas button { background: transparent; border: 0; color: #CFE3DD; font-family: var(--titulo); font-weight: 600; font-size: 1.15rem; padding: 8px 18px 10px; border-radius: 10px 10px 0 0; min-height: 44px; }
+.abas button[aria-current="page"] { background: var(--nevoa); color: var(--tinta); }
+.pagina { max-width: 1120px; margin: 0 auto; padding: 14px 12px 40px; }
+.aviso { background: #FFF6CC; border-left: 5px solid var(--boia); padding: 10px 12px; margin: 0 0 12px; font-size: 0.9rem; border-radius: 0 8px 8px 0; }
+.carregando { padding: 40px 0; text-align: center; color: var(--tinta-fraca); }
+.cartao { background: var(--papel); border: 1px solid var(--linha); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+
+/* medida do dia */
+.medida { border-radius: 16px; padding: 16px; margin-bottom: 14px; color: var(--tinta); background: var(--bom); position: relative; overflow: hidden; }
+.medida.otimo { background: var(--otimo); color: #fff; }
+.medida.otimo .palavra::after { content: " ★"; color: var(--boia); }
+.medida.fraco { color: #fff; }
+.medida.medio { background: var(--boia); color: var(--tinta); }
+.medida.fraco { background: var(--ferrugem); }
+.medida .data { font-size: 0.95rem; opacity: .92; }
+.medida .linha { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-top: 2px; }
+.medida .palavra { font-family: var(--titulo); font-weight: 700; font-size: 3rem; line-height: 0.95; letter-spacing: 0.005em; }
+.medida .num { font-family: var(--titulo); font-weight: 700; font-size: 3.6rem; line-height: 0.85; }
+.medida .num small { display: block; font-family: Barlow, sans-serif; font-weight: 400; font-size: 0.72rem; text-align: right; margin-top: 4px; opacity: .9; }
+.medida p { margin: 10px 0 0; font-size: 0.95rem; }
+.medida p b { font-weight: 600; }
+
+/* gráfico dos dias */
+.grafico { display: flex; align-items: flex-end; gap: 3px; height: 150px; }
+.grafico button { flex: 1 1 0; min-width: 0; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; background: transparent; border: 0; padding: 0; text-align: center; }
+.grafico .v { font-size: 0.7rem; font-weight: 600; margin-bottom: 2px; }
+.grafico .b { border-radius: 4px 4px 0 0; background: var(--bom); min-height: 6px; }
+.grafico .otimo .b { background: var(--otimo); }
+.grafico .medio .b { background: var(--boia); } .grafico .fraco .b { background: var(--ferrugem); }
+.grafico .longe .b { opacity: .55; }
+.grafico .s { font-size: 0.68rem; color: var(--tinta-fraca); margin-top: 3px; line-height: 1.1; }
+.grafico .n { font-size: 0.78rem; font-weight: 600; line-height: 1.2; padding-bottom: 3px; border-bottom: 3px solid transparent; }
+.grafico [aria-pressed="true"] .n { border-bottom-color: var(--tinta); }
+.grafico [aria-pressed="true"] .b { box-shadow: inset 0 0 0 2px var(--tinta); }
+.grafico .fds .s { color: var(--tinta); font-weight: 600; }
+.legenda { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 10px; font-size: 0.78rem; color: var(--tinta-fraca); }
+.legenda i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; background: var(--bom); }
+.legenda .otimo { background: var(--otimo); }
+.legenda .medio { background: var(--boia); } .legenda .fraco { background: var(--ferrugem); }
+
+/* horários */
+.horarios { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-bottom: 12px; }
+.horarios button { background: var(--papel); border: 1.5px solid var(--linha); border-radius: 10px; padding: 6px 2px; min-height: 58px; }
+.horarios .h { display: block; font-size: 0.74rem; color: var(--tinta-fraca); }
+.horarios .q { display: block; font-family: var(--titulo); font-weight: 700; font-size: 1.5rem; line-height: 1.05; }
+.horarios [aria-pressed="true"] { background: var(--tinta); border-color: var(--tinta); color: #fff; }
+.horarios [aria-pressed="true"] .h { color: #CFE3DD; }
+.horarios .melhor .h::after { content: " ★"; color: #B88A00; }
+.horarios [aria-pressed="true"].melhor .h::after { color: var(--boia); }
+
+/* coluna d'água */
+.agua { border-radius: 12px; overflow: hidden; border: 1px solid var(--linha); }
+.agua .f { display: grid; grid-template-columns: 92px 1fr auto; gap: 8px; align-items: center; padding: 10px; min-height: 62px; }
+.agua .rot { font-family: var(--titulo); font-weight: 600; font-size: 1.05rem; line-height: 1.1; }
+.agua .rot small { display: block; font-family: Barlow, sans-serif; font-weight: 400; font-size: 0.72rem; opacity: .85; }
+.agua .t { font-family: var(--titulo); font-weight: 700; font-size: 1.25rem; white-space: nowrap; }
+.agua .raso { background: #EFE7D2; }
+.agua .sup { background: #BFE2D9; border-top: 3px solid #fff; }
+.agua .meia { background: #6DB3A3; }
+.agua .fundo { background: #1F6A5C; color: #fff; }
+.agua .fundo.ruim { background: repeating-linear-gradient(135deg, #1F6A5C, #1F6A5C 8px, #2B5C53 8px, #2B5C53 16px); }
+.peixes { display: flex; flex-wrap: wrap; gap: 5px; }
+.peixe { display: inline-flex; align-items: center; gap: 6px; background: #fff; color: var(--tinta); border: 0; border-radius: 999px; padding: 4px 5px 4px 10px; font-size: 0.82rem; min-height: 32px; box-shadow: 0 1px 2px rgba(0,0,0,.18); }
+.peixe b { border-radius: 999px; padding: 1px 7px; font-weight: 600; font-size: 0.8rem; }
+.dica-geral { margin: 10px 0 0; font-size: 0.9rem; }
+
+/* lista de espécies */
+.esp { display: grid; grid-template-columns: 34px 1fr 44px; gap: 8px; align-items: center; padding: 8px 0; border-top: 1px solid var(--linha); }
+.esp:first-of-type { border-top: 0; }
+.esp .marca-alvo { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--lago); background: transparent; color: transparent; font-weight: 700; padding: 0; line-height: 1; }
+.esp .marca-alvo[aria-pressed="true"] { background: var(--lago); color: #fff; }
+.esp .abre { background: transparent; border: 0; padding: 2px 0; text-align: left; min-height: 44px; width: 100%; }
+.esp .nome { font-weight: 600; }
+.esp .onde { font-size: 0.8rem; color: var(--tinta-fraca); }
+.esp .barra { height: 6px; border-radius: 3px; background: #E3EAE6; margin-top: 4px; overflow: hidden; }
+.esp .barra i { display: block; height: 100%; border-radius: 3px; }
+.esp .q { font-family: var(--titulo); font-weight: 700; font-size: 1.7rem; text-align: right; line-height: 1; }
+.selo { display: inline-block; border-radius: 4px; padding: 0 6px; font-size: 0.72rem; font-weight: 600; background: var(--bom); color: var(--tinta); margin-left: 6px; vertical-align: 1px; }
+.selo.otimo { background: var(--otimo); color: #fff; }
+.selo.fraco { color: #fff; }
+.estrategia { border-left: 6px solid var(--boia); }
+.selo.medio { background: var(--boia); color: var(--tinta); } .selo.fraco { background: var(--ferrugem); }
+
+details.cartao summary { font-family: var(--titulo); font-weight: 700; font-size: 1.2rem; cursor: pointer; }
+.porque { margin: 10px 0 0; padding-left: 20px; } .porque li { margin: 5px 0; }
+.rolagem { overflow-x: auto; margin-top: 10px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; table-layout: fixed; }
+th, td { padding: 6px 2px; text-align: center; border-bottom: 1px solid var(--linha); }
+thead th { font-weight: 600; font-size: 0.7rem; color: var(--tinta-fraca); }
+thead th:first-child { width: 32%; } tbody th { text-align: left; font-weight: 400; }
+td.sel, th.sel { background: #E9F1EE; font-weight: 600; }
+.chuva { color: var(--chuva); font-weight: 600; }
+
+/* ficha da espécie */
+.troca { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px; scrollbar-width: thin; }
+.troca button { flex: none; border: 1.5px solid var(--lago); background: transparent; color: var(--lago); border-radius: 999px; padding: 6px 12px; min-height: 38px; font-size: 0.88rem; }
+.troca button[aria-pressed="true"] { background: var(--lago); color: #fff; }
+.conta { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.25); border: 1.5px solid currentColor; border-radius: 999px; padding: 5px 12px; min-height: 36px; margin-top: 10px; font-size: 0.86rem; }
+.termica { position: relative; height: 26px; border-radius: 6px; margin: 26px 0 22px; }
+.termica .m { position: absolute; top: -22px; transform: translateX(-50%); font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.termica .m::after { content: ""; position: absolute; left: 50%; top: 18px; width: 2px; height: 34px; background: var(--tinta); }
+.termica .m.esq { transform: translateX(-100%); padding-right: 5px; } .termica .m.esq::after { left: 100%; }
+.termica .m.dir { transform: none; padding-left: 5px; } .termica .m.dir::after { left: 0; }
+.termica .e { position: absolute; bottom: -19px; font-size: 0.72rem; color: var(--tinta-fraca); transform: translateX(-50%); }
+.ficha h3 { font-size: 1.1rem; margin: 14px 0 4px; }
+.ficha ul { margin: 0; padding-left: 20px; } .ficha li { margin: 3px 0; } .ficha p { margin: 0; }
+.rodape { margin-top: 20px; font-size: 0.78rem; color: var(--tinta-fraca); }
+.rodape a { color: var(--lago); }
+
+@media (min-width: 900px) {
+  .grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; gap: 0 24px; align-items: start; }
+  .col-a { grid-column: 1; grid-row: 1; } .col-c { grid-column: 1; grid-row: 2; } .col-b { grid-column: 2; grid-row: 1 / span 2; }
+  .medida .palavra { font-size: 3.6rem; }
+  .grafico { height: 180px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .grafico .b { transition: height .25s ease; } .esp .barra i { transition: width .25s ease; }
+}
+</style>
+</head>
+<body>
+<div id="app"><header class="topo"><div class="dentro"><div class="marca"><h1>Dia de Pesca</h1></div><div class="abas"></div></div></header><main class="pagina"><p class="carregando">Buscando a previsão do tempo.</p></main></div>
+<script src="motor.js"></script>
+<script src="dicas.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
