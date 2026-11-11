@@ -1,7 +1,7 @@
 /* Dia de Pesca: guarda os arquivos do aplicativo para abrir sem internet e confere os dias marcados
    com o aplicativo fechado, quando o celular permite (sincronização periódica do Chrome no Android). */
 importScripts("motor.js");
-var VERSAO = "dia-de-pesca-v9", DADOS = "pesca-dados";
+var VERSAO = "dia-de-pesca-v10", DADOS = "pesca-dados";
 var ARQUIVOS = ["./", "index.html", "app.js", "motor.js", "dicas.js", "manifest.webmanifest", "icone-192.png", "icone-512.png",
   "fontes/barlow-400.woff2", "fontes/barlow-600.woff2", "fontes/barlow-condensed-600.woff2", "fontes/barlow-condensed-700.woff2"];
 

@@ -4,20 +4,24 @@
 (function (raiz) {
   "use strict";
   var REDONDOS = {
-    iscas: ["Ração de pesqueiro furada, na superfície ou no fundo", "Pão na boia (boia pão)", "Massa", "Iscas de EVA e anteninha", "Tripa de frango e fígado de boi", "Pedaços ou cabeça de tilápia em dia difícil"],
+    iscas: ["Ração de pesqueiro furada, na superfície ou no fundo", "Pão na boia (boia pão)", "Massa", "Iscas de EVA e anteninha", "Salsicha", "Tripa de frango e fígado de boi", "Pedaço, cabeça ou filé de tilápia em dia frio ou difícil"],
     montagens: [
-      "Boia cevadeira: a linha da carretilha e o rabicho da boia ficam de um lado do girador e o chicote com o anzol do outro, para a linha não torcer. Copo cheio de ração.",
+      "Boia cevadeira: a linha da carretilha e o rabicho da boia ficam de um lado do girador e o chicote com o anzol do outro, para a linha não torcer. Uma cevadeira pequena, de 45 g, com ração já chama o peixe para cima.",
       "Chicote de 1,5 a 2 m quando a ração trabalha na superfície.",
-      "Boia torpedo para arremesso longo.",
+      "Sistema goiano, de superfície: girador pequeno e chicote curto, de 30 a 40 cm.",
+      "Boia pão: girador, duas miçangas claras, boia guia grande sem pintura, chumbo grande e pão branco fresco no anzol maruseigo.",
+      "Boia pão regulável: a boia corre entre as duas miçangas travadas por stops. Mudando os stops você muda a profundidade da isca sem refazer a montagem.",
+      "Salsicha: girador pequeno, 30 cm de linha transparente e anzol maruseigo.",
       "Palminho (boinha e boião): boia pequena de isopor a um palmo do anzol, para peixe manhoso que está no fundo e sobe para a ração.",
+      "Boia torpedo para arremesso longo.",
       "Fundo: fígado em anzol encastoado, com chumbada solta na linha."
     ],
-    linha: "Monofilamento de 0,37 mm (cevadeira) a 0,40 mm (boia pão), citados por um canal de pesqueiro. Anzóis citados: tipo pacu e chinu, sem farpa. Chicote de multifilamento só se o pesqueiro permitir.",
+    linha: "As fontes variam com o porte do peixe: monofilamento de 0,37 mm (cevadeira) e 0,40 mm (boia pão) em um vídeo, 0,50 ou 0,60 mm na boia pão para tambaqui grande em outro. Anzóis citados: tipo pacu, chinu e maruseigo, sem farpa. Um canal diz perder menos peixe com o anzol tipo pacu do que com o octopus. Chicote curto de multifilamento, de 20 a 25 cm, é difícil de o peixe cortar, mas só vale se o pesqueiro permitir.",
     porDia: {
-      sup: ["ração flutuante na boia cevadeira", "pão na boia", "anteninha de EVA"],
-      meia: ["massa", "ração furada com boia regulada", "isca de EVA"],
+      sup: ["ração na cevadeira pequena", "pão na boia", "anteninha de EVA"],
+      meia: ["massa na boia pão regulável", "ração furada na boia regulável", "salsicha"],
       fundo: ["massa no fundo", "ração furada no fundo", "fígado de boi"],
-      dificil: ["fígado de boi", "tripa de frango", "pedaços ou cabeça de tilápia", "massa no fundo"]
+      dificil: ["pedaço, cabeça ou filé de tilápia na boia pão", "salsicha", "fígado de boi ou tripa de frango", "massa no fundo"]
     }
   };
   /* porDia: iscas por situação. Chaves: sup, meia, fundo e raso (faixa sugerida), dificil (dia fraco ou água esfriando) e padrao. */
@@ -26,29 +30,29 @@
       habito: "Carpa comum, húngara e espelho. Onívora, come no fundo. É a espécie da lista que menos sente a água fria.",
       zona: "fundo",
       iscas: ["Massa", "Milho", "Pastilhas"],
-      montagens: ["Pesca de fundo com massa.", "Chuveirinho de fundo com massa."],
+      montagens: ["Pesca de fundo com massa.", "Chuveirinho de fundo com massa.", "Técnica europeia, se o pesqueiro permitir: isca presa num laço ao lado do anzol (montagem de cabelo). Em fundo de lama, isca flutuante que fica um pouco acima do fundo."],
       linha: "Não achei bitola específica nas fontes. Vale a regra do pesqueiro.",
-      dicas: ["No frio a carpa come em janelas curtas, em geral no fim da tarde.", "Melhor crescimento entre 20 e 28 °C. Só para de comer perto de 4 °C."],
+      dicas: ["No frio a carpa come em janelas curtas, em geral no fim da tarde.", "Fica mais perto da superfície no amanhecer e no fim da tarde, e no fundo no resto do dia.", "Com vento, massa e isca natural no fundo rendem mais que boia.", "Melhor crescimento entre 20 e 28 °C. Só para de comer perto de 4 °C."],
       fonte: "boa",
       porDia: { padrao: ["massa no fundo", "milho", "pastilha"], dificil: ["massa no fundo", "milho"] }
     },
     carpacabecuda: {
       habito: "Carpa de cabeça grande. Filtra zooplâncton e fica na meia-água. Não ataca isca comum: é pega com a nuvem de massa em volta dos anzóis.",
       zona: "meia",
-      iscas: ["Pastilha de dissolução lenta, que forma uma nuvem em volta dos anzóis", "Massa fina própria para cabeçuda"],
+      iscas: ["Pastilha de dissolução lenta, que forma uma nuvem em volta dos anzóis", "Massa fina própria para cabeçuda", "Massa turbinada: farelo seco e um pouco de essência (banana ou mel) na massa base"],
       montagens: ["Chuveirinho (vários anzóis em volta de uma mola que segura a pastilha), suspenso na meia-água com boia. O stop na linha regula a altura.", "Em ponto mais fundo, chuveirinho de fundo."],
       linha: "Não achei bitola nas fontes.",
-      dicas: ["O que atrai é a nuvem de partículas, não o cheiro forte.", "Ajuste a altura do chuveirinho até achar a camada onde o cardume está.", "Faixa de temperatura estimada pelas outras carpas."],
+      dicas: ["O que atrai é a nuvem de partículas, não o cheiro forte.", "Peneire a massa: ela dissolve por igual e forma a neve que chama a carpa.", "Não exagere na essência, para não chamar outros peixes.", "Ajuste a altura do chuveirinho até achar a camada onde o cardume está.", "Faixa de temperatura estimada pelas outras carpas."],
       fonte: "boa",
       porDia: { padrao: ["pastilha no chuveirinho de meia-água", "massa fina para cabeçuda"], dificil: ["pastilha no chuveirinho de fundo"] }
     },
     carpacapim: {
       habito: "Herbívora. Come plantas e capim, não ração. Tolera grande variação de temperatura, mas a atividade cai bastante no outono e no inverno.",
       zona: "coluna",
-      iscas: ["Vegetais e capim", "Pão", "Milho"],
+      iscas: ["Capim e grama frescos, não secos", "Pão", "Milho", "Ração, que ela aprende a comer na criação"],
       montagens: ["Boia com pão ou vegetal na superfície.", "No frio, isca vegetal no fundo."],
       linha: "Não achei bitola nas fontes.",
-      dicas: ["Temperatura ideal de crescimento perto de 24 °C.", "Pouca fonte de pesqueiro. Trate como ponto de partida."],
+      dicas: ["Temperatura ideal de crescimento perto de 24 °C. Aguenta bem variação de temperatura e pouco oxigênio.", "Come capim e grama na superfície. Isca vegetal boiando rende mais com água morna.", "Pouca fonte de pesqueiro. Trate como ponto de partida."],
       fonte: "pouca",
       porDia: { sup: ["pão na boia", "folhas ou capim", "milho"], padrao: ["pão", "milho", "vegetais no fundo"] }
     },
@@ -68,7 +72,7 @@
       iscas: ["Iscas artificiais de superfície e de meia-água", "Peixes pequenos", "Coração de frango"],
       montagens: ["Artificial recolhida com velocidade, na superfície ou logo abaixo.", "Isca natural na meia-água, com boia."],
       linha: "Em pesquisa com pescadores de isca artificial, a maioria prefere multifilamento. Empate resistente a dente é prática comum, sem fonte para a bitola.",
-      dicas: ["Rende mais com luz baixa e água movimentada, perto da entrada de água ou do aerador.", "Pouca fonte específica de pesqueiro. Faixa de temperatura provisória."],
+      dicas: ["Rende mais com luz baixa e água movimentada, perto da entrada de água ou do aerador.", "Ataca isca de superfície. Use anzol simples sem farpa e deixe o peixe pouco tempo fora da água.", "Pouca fonte específica de pesqueiro. Faixa de temperatura provisória."],
       fonte: "pouca",
       porDia: { sup: ["artificial de superfície", "artificial de meia-água", "peixe pequeno na boia"], padrao: ["artificial de meia-água trabalhada devagar", "peixe pequeno", "coração de frango"] }
     },
@@ -78,7 +82,7 @@
       iscas: ["Artificiais de superfície (zara, popper, stick)", "Soft com anzol offset, para não enroscar", "Tuvira, lambari, minhocuçu e pedaço de carne fresca"],
       montagens: ["Artificial arremessada rente à vegetação e às estruturas.", "Soft antienrosco trabalhada devagar no fundo quando o peixe não sobe."],
       linha: "Em pesquisa com pescadores de isca artificial, a maioria prefere multifilamento. Empate resistente a dente é prática comum, sem fonte para a bitola.",
-      dicas: ["Iscas de superfície rendem mais no começo da manhã e no fim da tarde.", "Quando a temperatura cai, fica lenta e desce para o fundo ou entra nas estruturas."],
+      dicas: ["Iscas de superfície rendem mais no começo da manhã e no fim da tarde.", "Quando a temperatura cai, fica lenta e desce para o fundo ou entra nas estruturas.", "Trabalhe a artificial com pausas. A parada costuma disparar o ataque.", "Tire o anzol com alicate de bico, por causa dos dentes."],
       fonte: "boa",
       porDia: { raso: ["artificial de superfície (zara ou popper)", "soft antienrosco", "lambari ou tuvira"], padrao: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"], dificil: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"] }
     },
@@ -89,23 +93,23 @@
       iscas: ["Peixe em postas", "Fígado de galinha, coração de frango ou de boi", "Minhoca e salsicha", "Massas de cheiro forte"],
       montagens: ["Pesca de fundo com chumbo para manter a isca no fundo."],
       linha: "Equipamento leve a médio.",
-      dicas: ["Noite e amanhecer são os horários mais citados, quando ele vai para o raso e para as margens.", "Dias nublados e água turva ajudam."],
+      dicas: ["Noite e amanhecer são os horários mais citados, quando ele vai para o raso e para as margens.", "Dias nublados e água turva ajudam.", "Em água muito clara e com muita luz ele fica agitado. Procure sombra, fundo e o lado mais turvo do lago."],
       fonte: "boa"
     },
     tilapia: {
-      porDia: { sup: ["massa doce ou frutada que solta partículas", "ração na boia cevadeira", "milho"], meia: ["massa macia", "minhoca", "milho"], padrao: ["massa de cheiro forte, que dissolve devagar", "minhoca", "bicho da laranjeira"], dificil: ["massa de cheiro forte, que dissolve devagar", "minhoca", "bicho da laranjeira"] },
-      habito: "Onívora. Belisca e testa a isca antes de levar. Sobe no calor e fica no fundo em dia difícil.",
+      habito: "Onívora. Belisca e testa a isca antes de levar. Sobe no calor. No frio vai para o fundo e come menos.",
       zona: "coluna",
-      iscas: ["Massa macia, do tamanho de uma azeitona média, cobrindo todo o anzol", "Minhoca, milho, bicho da laranjeira", "Calor: massas doces e frutadas que soltam partículas", "Dia difícil: massa de cheiro forte, que dissolve devagar"],
+      iscas: ["Massa macia, do tamanho de uma azeitona média, cobrindo todo o anzol", "Minhoca, milho, bicho da laranjeira", "Calor: massas doces e frutadas que soltam partículas", "Frio ou dia difícil: massa de cheiro forte (queijo, sangue ou fígado), que dissolve devagar", "Massa em tablete ou bloco quando há lambari beliscando"],
       montagens: [
-        "Linha folgada e chumbo livre, para o peixe trabalhar a massa sem sentir peso.",
+        "Linha folgada e chumbo livre: quando a tilápia puxa, quem se mexe é o chicote, não o chumbo, e ela não sente peso.",
         "Chuveirinho com mola para segurar a massa.",
         "No calor, boia cevadeira na superfície.",
-        "Peixe manhoso: massa parada no fundo."
+        "No frio ou com peixe manhoso: massa parada no fundo."
       ],
       linha: "Anzol pequeno e discreto, tipo chinu ou tinu. Para tilápia menor, chinu 2 a 4. Sem bitola de linha nas fontes: quanto mais fina o pesqueiro permitir, melhor a fisgada.",
-      dicas: ["Se a massa some e não fisga, diminua a bolinha.", "Fisgue quando a linha esticar, não no primeiro toque."],
-      fonte: "boa"
+      dicas: ["Se a massa some e não fisga, diminua a bolinha.", "Fisgue quando a linha esticar, não no primeiro toque.", "Em água turva, massa vermelha ou branca aparece mais.", "Em criação, o desempenho já cai com a água abaixo de 23 °C e o conforto fica entre 27 e 32 °C."],
+      fonte: "boa",
+      porDia: { sup: ["massa doce ou frutada que solta partículas", "ração na boia cevadeira", "milho"], meia: ["massa macia", "minhoca", "milho"], padrao: ["massa de cheiro forte (queijo, sangue ou fígado) no fundo", "minhoca", "massa em tablete"], dificil: ["massa de cheiro forte (queijo, sangue ou fígado) no fundo", "minhoca", "massa em tablete"] }
     },
     matrinxa: {
       habito: "Peixe de escama amazônico, ativo, de superfície e meia-água. Tolera de 18 a 36 °C. A 12 °C morre.",
@@ -114,7 +118,7 @@
       montagens: ["Boia com isca na superfície ou na meia-água.", "Artificial pequena recolhida rápido."],
       linha: "Sem bitola nas fontes.",
       porDia: { padrao: ["ração", "coração de frango", "milho"], dificil: ["coração de frango", "milho"] },
-      dicas: ["Faixa ideal de criação entre 25 e 28 °C. Abaixo disso come menos.", "Se faltar oxigênio, sobe para respirar na camada de cima e não come."],
+      dicas: ["Faixa ideal de criação entre 25 e 28 °C. Abaixo disso come menos.", "No rio vive junto a pedras e troncos e come frutinhas, sementes, insetos e peixes pequenos. Use isca pequena, perto de estrutura.", "Se faltar oxigênio, sobe para respirar na camada de cima e não come."],
       fonte: "pouca"
     },
     piraputanga: {
@@ -162,10 +166,10 @@
       porDia: { padrao: ["tilápia em postas ou cabeça", "peixes pequenos", "fígado"] },
       habito: "Surubim de pintas. Predador de fundo, caça mais com pouca luz. Conforto de 24 a 30 °C.",
       zona: "fundo",
-      iscas: ["Peixes pequenos e pedaços de peixe", "Tilápia em postas ou cabeça", "Fígado e iscas de cheiro forte"],
+      iscas: ["Peixes pequenos e pedaços de peixe", "Tilápia em postas ou cabeça", "Fígado e iscas de cheiro forte", "Massa de fundo com cheiro de sangue ou de peixe"],
       montagens: ["Pesca de fundo com chumbada solta e isca natural."],
       linha: "Líder de fluorocarbono é citado para a linha não ser cortada. Sem bitola nas fontes.",
-      dicas: ["Amanhecer e entardecer são os melhores horários. De dia, céu fechado ajuda."],
+      dicas: ["Amanhecer e entardecer são os melhores horários. De dia, céu fechado ajuda.", "Fica no fundo ou na meia-água, junto a troncos e pedras. Coloque a isca rente à estrutura.", "Com artificial, soft no fundo, devagar e com pausas."],
       fonte: "boa"
     },
     cachara: {
@@ -175,7 +179,7 @@
       montagens: ["Pesca de fundo com chumbada solta e isca natural."],
       linha: "Líder de fluorocarbono é citado para a linha não ser cortada. Sem bitola nas fontes.",
       porDia: { padrao: ["tilápia em postas ou cabeça", "peixes pequenos", "fígado"] },
-      dicas: ["Amanhecer e céu fechado são os melhores momentos entre 5h e 17h."],
+      dicas: ["Amanhecer e céu fechado são os melhores momentos entre 5h e 17h.", "Costuma ficar parada, de tocaia. Isca natural parada no fundo, perto de estruturas, e paciência."],
       fonte: "boa"
     },
     cachapira: {
@@ -192,7 +196,7 @@
       habito: "Onívoro amazônico. Precisa de água quente e tolera pouco oxigênio.",
       zona: "coluna",
       iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
-      dicas: ["Abaixo de 25 °C já perde apetite. Em São Bernardo, é peixe de dias quentes.", "Com calor, sobe e ataca a ração na superfície."],
+      dicas: ["Abaixo de 25 °C já perde apetite. Em São Bernardo, é peixe de dias quentes.", "Na friagem o metabolismo e a fome caem muito. Depois de frente fria, espere a água esquentar de novo.", "Com calor, sobe e ataca a ração na superfície."],
       fonte: "boa"
     },
     pirapitinga: {
@@ -210,14 +214,14 @@
       fonte: "pouca"
     },
     pirarara: {
-      porDia: { padrao: ["peixe inteiro ou em postas", "cabeça e guelras de tilápia", "fígado de boi", "salsicha"] },
-      habito: "Bagre grande, de fundo, onívoro e noturno.",
+      habito: "Bagre grande, de fundo, onívoro e noturno. Come quase de tudo: os pescadores a chamam de lixeira do lago.",
       zona: "fundo",
-      iscas: ["Isca natural grande: peixe inteiro ou em postas", "Cabeça e guelras de tilápia", "Fígado de boi", "Salsicha"],
-      montagens: ["Pesca de fundo com anzol circular forte.", "Fígado em anzol encastoado, com chumbada solta."],
-      linha: "Equipamento reforçado. Sem bitola nas fontes.",
-      dicas: ["Dê tempo para o peixe engolir a isca antes de fisgar.", "Depois da fisgada, pressione logo para ele não levar a linha para as estruturas.", "Faixa de temperatura estimada pela origem amazônica."],
-      fonte: "boa"
+      iscas: ["Cabeça de tilápia e peixe em postas", "Isca viva, se o pesqueiro permitir: tilápia ou lambari", "Salsicha, queijo, bacon, ovo cozido e filé de frango", "Fígado de boi"],
+      montagens: ["Pesca de fundo com anzol circular forte.", "Fígado em anzol encastoado, com chumbada solta.", "Com o lago cheio ela se afasta da margem: arremesse de 5 a 20 m para dentro."],
+      linha: "Equipamento pesado. Sem bitola nas fontes.",
+      dicas: ["Dê tempo para o peixe engolir a isca antes de fisgar.", "Depois da fisgada, pressione logo para ele não levar a linha para as estruturas.", "Segure sempre na horizontal, apoiando o corpo. Levantar pela boca ou pela guelra pode matar o peixe.", "Faixa de temperatura estimada pela origem amazônica."],
+      fonte: "boa",
+      porDia: { padrao: ["cabeça de tilápia ou peixe em postas", "salsicha", "fígado de boi", "queijo ou bacon"] }
     },
     tucunare: {
       habito: "Predador diurno de estrutura, de origem amazônica. Ótimo perto de 28 °C. Perto de 15 °C morre.",
@@ -235,7 +239,7 @@
       iscas: ["Isca viva ou natural (peixe), conforme a regra do pesqueiro", "Ração, em lagos onde é tratado com ela"],
       montagens: ["Isca natural com boia, perto de onde o peixe sobe para respirar."],
       linha: "Equipamento reforçado. Sem bitola nas fontes.",
-      dicas: ["Observe onde ele boia para respirar e arremesse perto.", "Em São Bernardo a água fica fria para ele boa parte do ano. Faixa de temperatura provisória."],
+      dicas: ["Observe onde ele boia para respirar e arremesse perto.", "Ele sobe para respirar ar a cada 15 a 20 minutos. Marque o ponto e espere a próxima subida.", "Em São Bernardo a água fica fria para ele boa parte do ano. Faixa de temperatura provisória."],
       fonte: "pouca",
       porDia: { padrao: ["peixe vivo ou em pedaços, se o pesqueiro permitir", "ração, se for o trato do lago"] }
     }

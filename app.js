@@ -18,6 +18,9 @@
     "Peixe boiando sem comer no começo da manhã é sinal de pouco oxigênio. Espere o sol subir.",
     "Com vento forte, evite boia cevadeira no pesqueiro: a linha corre e enrosca na do vizinho.",
     "Fim de semana e lago cheio deixam o peixe mais arisco. O horário do trato do pesqueiro também muda o comportamento.",
+    "Observe o que está funcionando no lago e copie. Em dia difícil, quem acerta a isca pega peixe atrás de peixe enquanto os outros ficam sem ação.",
+    "Tenha uma montagem com profundidade regulável. Sem ação, mude a altura da isca antes de mudar de isca ou de lugar.",
+    "Sem saber o que o lago está comendo, comece pelas iscas coringa de pesqueiro: ração, massa, pão, salsicha e minhocuçu.",
     "Confira sempre a regra do pesqueiro para anzol, isca e chicote."
   ];
   var SEM1 = ["D", "S", "T", "Q", "Q", "S", "S"];
@@ -451,7 +454,7 @@
       '<p class="sub" style="margin:0">Verde escuro: faixa de conforto. A nota térmica zera em ' + e.z1 + ' °C e em ' + e.z2 + ' °C.' + (e.provisorio ? " Faixa provisória, com pouca fonte." : "") + '</p></section>' +
       '<section class="cartao ficha"><h2>Como pescar</h2><p>' + esc(dic.habito) + '</p>' +
       '<h3>Iscas</h3>' + ul(dic.iscas) + '<h3>Montagens</h3>' + ul(dic.montagens) + '<h3>Linha e anzol</h3><p>' + esc(dic.linha) + '</p><h3>Dicas</h3>' + ul(dic.dicas) +
-      '<p class="sub" style="margin:14px 0 0">' + (dic.fonte === "pouca" ? "Pouca fonte específica de pesqueiro para esta espécie. " : "") + 'Prática de pescadores e de sites de pesca, sem medição. Confira sempre a regra do pesqueiro para anzol, isca e chicote. Fontes em pesquisa/03 do projeto.</p></section></div></div>' + rodape() + '</main>';
+      '<p class="sub" style="margin:14px 0 0">' + (dic.fonte === "pouca" ? "Pouca fonte específica de pesqueiro para esta espécie. " : "") + 'Prática de pescadores e de sites de pesca, sem medição. Confira sempre a regra do pesqueiro para anzol, isca e chicote. Fontes em pesquisa/03 e pesquisa/05 do projeto.</p></section></div></div>' + rodape() + '</main>';
     app.innerHTML = h;
   }
 
