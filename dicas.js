@@ -12,10 +12,18 @@
       "Palminho (boinha e boião): boia pequena de isopor a um palmo do anzol, para peixe manhoso que está no fundo e sobe para a ração.",
       "Fundo: fígado em anzol encastoado, com chumbada solta na linha."
     ],
-    linha: "Monofilamento de 0,37 mm (cevadeira) a 0,40 mm (boia pão), citados por um canal de pesqueiro. Anzóis citados: tipo pacu e chinu, sem farpa. Chicote de multifilamento só se o pesqueiro permitir."
+    linha: "Monofilamento de 0,37 mm (cevadeira) a 0,40 mm (boia pão), citados por um canal de pesqueiro. Anzóis citados: tipo pacu e chinu, sem farpa. Chicote de multifilamento só se o pesqueiro permitir.",
+    porDia: {
+      sup: ["ração flutuante na boia cevadeira", "pão na boia", "anteninha de EVA"],
+      meia: ["massa", "ração furada com boia regulada", "isca de EVA"],
+      fundo: ["massa no fundo", "ração furada no fundo", "fígado de boi"],
+      dificil: ["fígado de boi", "tripa de frango", "pedaços ou cabeça de tilápia", "massa no fundo"]
+    }
   };
+  /* porDia: iscas por situação. Chaves: sup, meia, fundo e raso (faixa sugerida), dificil (dia fraco ou água esfriando) e padrao. */
   var D = {
     carpas: {
+      porDia: { padrao: ["massa no fundo", "milho", "pastilha no chuveirinho de meia-água, para a cabeçuda", "pão ou vegetais, para a capim"], dificil: ["massa no fundo", "milho", "pastilha no chuveirinho de fundo, para a cabeçuda"] },
       habito: "Carpa comum e húngara comem no fundo. A cabeçuda filtra plâncton e fica na meia-água. A capim é herbívora e não come ração.",
       zona: "fundo",
       iscas: ["Massa, pastilhas e milho", "Cabeçuda: pastilha que se dissolve devagar e forma uma nuvem em volta dos anzóis", "Capim: vegetais e pão"],
@@ -29,6 +37,7 @@
       fonte: "boa"
     },
     jundia: {
+      porDia: { padrao: ["minhoca ou minhocuçu", "coração de frango", "isca de cheiro forte"] },
       habito: "Bagre nativo, onívoro, de fundo. Continua ativo no inverno.",
       zona: "fundo",
       iscas: ["Minhoca e minhocuçu", "Coração de frango ou de boi", "Iscas de cheiro forte usadas para bagres"],
@@ -38,6 +47,7 @@
       fonte: "pouca"
     },
     traira: {
+      porDia: { raso: ["artificial de superfície (zara ou popper)", "soft antienrosco", "lambari ou tuvira"], padrao: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"], dificil: ["soft antienrosco devagar no fundo", "lambari, tuvira ou minhocuçu", "pedaço de carne fresca"] },
       habito: "Traíra: predador de emboscada, fica em margens com vegetação, troncos e sombra. Dourado: carnívoro de hábito diurno, ataca na superfície.",
       zona: "raso",
       iscas: ["Traíra, artificiais: superfície (zara, popper, stick), soft com anzol offset para não enroscar", "Traíra, naturais: tuvira, lambari, minhocuçu, pedaço de carne fresca", "Dourado: iscas de superfície"],
@@ -47,6 +57,7 @@
       fonte: "boa"
     },
     catfish: {
+      porDia: { padrao: ["fígado de galinha", "coração de frango ou de boi", "minhoca", "massa de cheiro forte", "salsicha"] },
       habito: "Bagre de fundo, guiado pelo olfato. Fica agitado com muita luz e água transparente.",
       zona: "fundo",
       iscas: ["Peixe em postas", "Fígado de galinha, coração de frango ou de boi", "Minhoca e salsicha", "Massas de cheiro forte"],
@@ -56,6 +67,7 @@
       fonte: "boa"
     },
     tilapia: {
+      porDia: { sup: ["massa doce ou frutada que solta partículas", "ração na boia cevadeira", "milho"], meia: ["massa macia", "minhoca", "milho"], padrao: ["massa de cheiro forte, que dissolve devagar", "minhoca", "bicho da laranjeira"], dificil: ["massa de cheiro forte, que dissolve devagar", "minhoca", "bicho da laranjeira"] },
       habito: "Onívora. Belisca e testa a isca antes de levar. Sobe no calor e fica no fundo em dia difícil.",
       zona: "coluna",
       iscas: ["Massa macia, do tamanho de uma azeitona média, cobrindo todo o anzol", "Minhoca, milho, bicho da laranjeira", "Calor: massas doces e frutadas que soltam partículas", "Dia difícil: massa de cheiro forte, que dissolve devagar"],
@@ -70,6 +82,7 @@
       fonte: "boa"
     },
     matrinxa: {
+      porDia: { padrao: ["ração", "coração de frango", "milho"], dificil: ["coração de frango", "milho"] },
       habito: "Peixes de escama ativos, de superfície e meia-água.",
       zona: "coluna",
       iscas: ["Ração", "Coração de frango", "Milho, para piau e piraputanga", "Matrinxã: pequenas iscas artificiais (spinner e plug pequeno)"],
@@ -81,18 +94,19 @@
     pacu: {
       habito: "Onívoro. É o mais tolerante ao frio entre os redondos.",
       zona: "coluna",
-      iscas: REDONDOS.iscas.concat(["Milho"]), montagens: REDONDOS.montagens, linha: REDONDOS.linha,
+      iscas: REDONDOS.iscas.concat(["Milho"]), montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
       dicas: ["Com água morna, sobe para comer na superfície. Em dia ruim fica no fundo ou na meia-água.", "Boia cevadeira não combina com vento forte em pesqueiro: a linha corre e enrosca na do vizinho."],
       fonte: "boa"
     },
     tambacu: {
       habito: "Híbrido de tambaqui com pacu. Aguenta mais frio que o tambaqui e menos que o pacu.",
       zona: "coluna",
-      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha,
+      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
       dicas: ["Boia na superfície quando o peixe sobe, em dia quente.", "Em dia ruim, fundo ou meia-água, com isca de cheiro (fígado, tilápia)."],
       fonte: "boa"
     },
     pintado: {
+      porDia: { padrao: ["tilápia em postas ou cabeça", "peixes pequenos", "fígado"] },
       habito: "Predadores de fundo. Caçam mais com pouca luz.",
       zona: "fundo",
       iscas: ["Peixes pequenos e pedaços de peixe", "Tilápia em postas ou cabeça", "Fígado e iscas de cheiro forte"],
@@ -104,18 +118,19 @@
     tambaqui: {
       habito: "Onívoro amazônico. Precisa de água quente e tolera pouco oxigênio.",
       zona: "coluna",
-      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha,
+      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
       dicas: ["Abaixo de 25 °C já perde apetite. Em São Bernardo, é peixe de dias quentes.", "Com calor, sobe e ataca a ração na superfície."],
       fonte: "boa"
     },
     pirapitinga: {
       habito: "Redondos de origem amazônica e seus híbridos. Sentem bastante o frio.",
       zona: "coluna",
-      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha,
+      iscas: REDONDOS.iscas, montagens: REDONDOS.montagens, linha: REDONDOS.linha, porDia: REDONDOS.porDia,
       dicas: ["Use as mesmas montagens dos outros redondos.", "Faixa de temperatura da pirapitinga. Para os híbridos é uma aproximação."],
       fonte: "pouca"
     },
     pirarara: {
+      porDia: { padrao: ["peixe inteiro ou em postas", "cabeça e guelras de tilápia", "fígado de boi", "salsicha"] },
       habito: "Bagre grande, de fundo, onívoro e noturno.",
       zona: "fundo",
       iscas: ["Isca natural grande: peixe inteiro ou em postas", "Cabeça e guelras de tilápia", "Fígado de boi", "Salsicha"],
@@ -125,6 +140,7 @@
       fonte: "boa"
     },
     pirarucu: {
+      porDia: { padrao: ["isca viva ou natural, se o pesqueiro permitir", "artificial de superfície ou de meia-água, para o tucunaré"] },
       habito: "Pirarucu sobe para respirar na superfície. Tucunaré é predador de estrutura.",
       zona: "raso",
       iscas: ["Pirarucu: isca viva ou natural, conforme a regra do pesqueiro", "Tucunaré: iscas artificiais de superfície e de meia-água, e soft"],
