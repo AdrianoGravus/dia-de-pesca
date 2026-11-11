@@ -30,7 +30,8 @@
   var BOIA = '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="15" y="1" width="2" height="9" rx="1" fill="#fff"/><rect x="15" y="25" width="2" height="6" rx="1" fill="#9DBBAF"/><path d="M16 8c4 0 6.5 4 6.5 9h-13C9.500 12 12 8 16 8z" fill="#F4C20D"/><path d="M9.500 17h13c0 5-2.500 9-6.500 9s-6.500-4-6.500-9z" fill="#fff"/></svg>';
   var params = new URLSearchParams(location.search);
   var app = document.getElementById("app");
-  var estado = { dias: [], prox: [], res: {}, posicao: null, aviso: "", baixadoEm: null, cfg: lerCfg(), dia: null, per: null, esp: null };
+  var estado = { dias: [], prox: [], res: {}, posicao: null, aviso: "", baixadoEm: null, cfg: lerCfg(), dia: null, per: null, esp: null,
+    local: null, busca: { aberta: false, q: "", itens: null, erro: "", carregando: false } };
 
   // ---------- armazenamento local
   function ler(chave) { try { return JSON.parse(localStorage.getItem(chave)); } catch (e) { return null; } }
@@ -39,6 +40,8 @@
     var c = ler("pesca.cfg") || {};
     return { alvos: Array.isArray(c.alvos) ? c.alvos : M.ESPECIES.filter(function (e) { return e.alvo; }).map(function (e) { return e.id; }), motor: M.CONFIG_PADRAO };
   }
+  estado.local = ler("pesca.local") || { modo: "gps" };   // "gps" ou "fixo" (pesqueiro escolhido na busca)
+  function locaisRecentes() { var l = ler("pesca.locais"); return Array.isArray(l) ? l : []; }
   function salvarCfg() { gravar("pesca.cfg", { alvos: estado.cfg.alvos }); }
 
   // ---------- utilidades
@@ -97,7 +100,8 @@
   // ---------- posição e dados
   function obterPosicao() {
     return new Promise(function (resolver) {
-      var padrao = { lat: PADRAO.lat, lon: PADRAO.lon, origem: "padrao" };
+      var padrao = { lat: PADRAO.lat, lon: PADRAO.lon, origem: "padrao" }, L = estado.local;
+      if (L && L.modo === "fixo") return resolver({ lat: L.lat, lon: L.lon, origem: "fixo", nome: L.nome });
       if (params.get("semgps") || !navigator.geolocation) return resolver(padrao);
       var feito = false;
       var relogio = setTimeout(function () { if (!feito) { feito = true; resolver(padrao); } }, 9000);
@@ -156,16 +160,55 @@
 
   // ---------- peças das telas
   function cabecalho(aba) {
-    var p = estado.posicao, onde = !p ? "" : (p.origem === "gps" ? "Posição do aparelho (" + p.lat.toFixed(2).replace(".", ",") + " / " + p.lon.toFixed(2).replace(".", ",") + ")" : PADRAO.nome + " (posição padrão)");
+    var p = estado.posicao, onde = !p ? "" : (p.origem === "fixo" ? p.nome : p.origem === "gps" ? "Posição do aparelho (" + p.lat.toFixed(2).replace(".", ",") + " / " + p.lon.toFixed(2).replace(".", ",") + ")" : PADRAO.nome + " (posição padrão)");
     return '<header class="topo"><div class="dentro"><div class="marca">' + BOIA + '<h1>Dia de Pesca</h1></div>' +
-      (p ? '<div class="local"><span>' + esc(onde) + '</span><button data-a="pos">Atualizar posição</button></div>' : '') +
+      (p ? '<div class="local"><span>' + esc(onde) + '</span><button data-a="busca">Buscar pesqueiro</button>' +
+        (p.origem === "fixo" ? '<button data-a="gps">Usar minha posição</button>' : '<button data-a="pos">Atualizar posição</button>') + '</div>' : '') +
       '<nav class="abas" aria-label="Telas"><button data-a="nav" data-v="dias"' + (aba === "dias" ? ' aria-current="page"' : '') + '>Dias</button>' +
       '<button data-a="nav" data-v="especies"' + (aba === "especies" ? ' aria-current="page"' : '') + '>Espécies</button></nav></div></header>';
   }
+  function painelBusca() {
+    var b = estado.busca, rec = locaisRecentes(), h = '<section class="cartao busca"><h2>Buscar pesqueiro</h2>' +
+      '<p class="sub">Digite o nome do pesqueiro e, se puder, a cidade. Se não achar, busque pela cidade ou cole as coordenadas do mapa (exemplo: -23,69, -46,57).</p>' +
+      '<form data-f="busca"><input type="search" name="q" value="' + esc(b.q) + '" placeholder="Nome do pesqueiro e cidade" aria-label="Nome do pesqueiro e cidade" autocomplete="off"><button type="submit">Buscar</button></form>';
+    if (b.carregando) h += '<p class="sub" style="margin:10px 0 0">Buscando.</p>';
+    if (b.erro) h += '<p class="aviso" style="margin:10px 0 0">' + esc(b.erro) + '</p>';
+    if (b.itens && b.itens.length) h += '<div class="achados">' + b.itens.map(function (x, i) {
+      return '<button data-a="local" data-v="' + i + '"><b>' + esc(x.nome) + '</b><span>' + esc(x.onde) + '</span></button>'; }).join("") + '</div>';
+    if (rec.length) h += '<p class="sub" style="margin:12px 0 6px">Usados antes</p><div class="troca" style="margin:0;padding:0">' + rec.map(function (x, i) {
+      return '<button data-a="recente" data-v="' + i + '">' + esc(x.nome) + '</button>'; }).join("") + '</div>';
+    return h + '<p style="margin:12px 0 0"><button class="fechar" data-a="busca">Fechar a busca</button></p></section>';
+  }
   function avisos() {
-    var h = estado.aviso ? '<p class="aviso">' + esc(estado.aviso) + '</p>' : '';
-    if (estado.posicao.origem !== "gps" && !params.get("semgps")) h += '<p class="aviso">Não consegui ler a posição do aparelho. Usando ' + PADRAO.nome + '. Libere a localização para este site e toque em Atualizar posição.</p>';
+    var h = estado.busca.aberta ? painelBusca() : '';
+    if (estado.aviso) h += '<p class="aviso">' + esc(estado.aviso) + '</p>';
+    if (estado.posicao.origem === "padrao" && !params.get("semgps")) h += '<p class="aviso">Não consegui ler a posição do aparelho. Usando ' + PADRAO.nome + '. Libere a localização para este site e toque em Atualizar posição, ou busque um pesqueiro.</p>';
     return h;
+  }
+  /* Busca de lugar no OpenStreetMap (Nominatim). Aceita também coordenadas digitadas. */
+  function buscar(q) {
+    var b = estado.busca; b.q = q; b.itens = null; b.erro = "";
+    var m = q.match(/^\s*(-?\d{1,2}[.,]\d+)\s*[,;\s]\s*(-?\d{1,3}[.,]\d+)\s*$/);
+    if (m) { b.itens = [{ nome: "Ponto do mapa", onde: m[1] + " / " + m[2], lat: parseFloat(m[1].replace(",", ".")), lon: parseFloat(m[2].replace(",", ".")) }]; return desenhar(true); }
+    if (q.trim().length < 3) { b.erro = "Digite pelo menos três letras."; return desenhar(true); }
+    b.carregando = true; desenhar(true);
+    fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=br&limit=8&addressdetails=1&accept-language=pt-BR&q=" + encodeURIComponent(q.trim()))
+      .then(function (r) { if (!r.ok) throw new Error("resposta " + r.status); return r.json(); })
+      .then(function (lista) {
+        b.carregando = false;
+        b.itens = lista.map(function (x) {
+          var a = x.address || {}, cidade = a.city || a.town || a.municipality || a.village || a.county || "";
+          return { nome: x.name || String(x.display_name).split(",")[0], onde: [a.suburb || a.road || "", cidade, a.state || ""].filter(Boolean).join(", "), lat: parseFloat(x.lat), lon: parseFloat(x.lon) };
+        }).filter(function (x) { return isFinite(x.lat) && isFinite(x.lon); });
+        if (!b.itens.length) b.erro = "Nada encontrado. Nem todo pesqueiro está no mapa. Tente só a cidade ou o bairro, ou cole as coordenadas.";
+        desenhar(true);
+      }).catch(function () { b.carregando = false; b.erro = "A busca não respondeu. Confira a internet e tente de novo."; desenhar(true); });
+  }
+  function usarLocal(x) {
+    var novo = { modo: "fixo", lat: +x.lat.toFixed(3), lon: +x.lon.toFixed(3), nome: x.nome + (x.onde && x.nome !== "Ponto do mapa" ? " (" + x.onde.split(", ").slice(-2, -1)[0] + ")" : x.nome === "Ponto do mapa" ? " (" + x.onde + ")" : "") };
+    var rec = locaisRecentes().filter(function (r) { return r.nome !== novo.nome; }); rec.unshift(novo); gravar("pesca.locais", rec.slice(0, 8));
+    estado.local = novo; gravar("pesca.local", novo); estado.busca.aberta = false; estado.busca.itens = null;
+    app.innerHTML = cabecalho("") + '<main class="pagina"><p class="carregando">Buscando a previsão para ' + esc(novo.nome) + '.</p></main>'; iniciar();
   }
   function tituloDia(d) { var dt = dataLocal(d.data); return SEM[dt.getDay()] + ", " + dt.getDate() + " de " + MESES[dt.getMonth()] + (d.data === hojeISO() ? " (hoje)" : ""); }
   /* gráfico de barras dos 16 dias. valor(d, r) -> nota; medida(d, r) -> "bom" | "medio" | "fraco" */
@@ -294,7 +337,7 @@
   }
   function rodape() {
     return '<p class="rodape">Temperatura da água estimada pelo tempo, ainda sem calibração. Notas, medida do dia e profundidade são calculadas por regras provisórias do projeto. Dicas de isca e montagem vêm de prática de pescadores.<br>' +
-      'Previsão do tempo: <a href="https://open-meteo.com/">Open-Meteo</a>, licença CC BY 4.0. Atualizada em ' + (estado.baixadoEm ? quando(estado.baixadoEm) : "") + '.</p>';
+      'Previsão do tempo: <a href="https://open-meteo.com/">Open-Meteo</a>, licença CC BY 4.0. Busca de lugares: <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>. Atualizada em ' + (estado.baixadoEm ? quando(estado.baixadoEm) : "") + '.</p>';
   }
 
   /* Estratégia do dia: frases montadas a partir das notas, da profundidade sugerida e do tempo previsto. */
@@ -424,10 +467,18 @@
       var k = estado.cfg.alvos.indexOf(v); if (k >= 0) estado.cfg.alvos.splice(k, 1); else estado.cfg.alvos.push(v);
       salvarCfg(); recalcular(); desenhar(true);
     }
+    else if (a === "busca") { estado.busca.aberta = !estado.busca.aberta; desenhar(estado.busca.aberta ? false : true); var campo = app.querySelector(".busca input"); if (campo) campo.focus(); }
+    else if (a === "local") usarLocal(estado.busca.itens[+v]);
+    else if (a === "recente") { var rr = locaisRecentes()[+v]; usarLocal({ lat: rr.lat, lon: rr.lon, nome: rr.nome, onde: "" }); }
+    else if (a === "gps") { estado.local = { modo: "gps" }; gravar("pesca.local", estado.local); gravar("pesca.dados", null); app.innerHTML = cabecalho("") + '<main class="pagina"><p class="carregando">Lendo a posição do aparelho.</p></main>'; iniciar(); }
     else if (a === "pos") { gravar("pesca.dados", null); app.innerHTML = cabecalho("") + '<main class="pagina"><p class="carregando">Lendo a posição do aparelho.</p></main>'; iniciar(); }
     else if (a === "recarregar") location.reload();
   });
 
+  app.addEventListener("submit", function (ev) {
+    var f = ev.target.closest("[data-f=busca]"); if (!f) return;
+    ev.preventDefault(); buscar(f.querySelector("input").value);
+  });
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     navigator.serviceWorker.register("sw.js").catch(function () { /* sem modo offline */ });
   }

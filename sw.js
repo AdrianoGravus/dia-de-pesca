@@ -1,6 +1,6 @@
 /* Dia de Pesca: guarda os arquivos do aplicativo para abrir sem internet.
    A previsão do tempo não passa por aqui: o app.js guarda a última resposta no aparelho. */
-var VERSAO = "dia-de-pesca-v5";
+var VERSAO = "dia-de-pesca-v6";
 var ARQUIVOS = ["./", "index.html", "app.js", "motor.js", "dicas.js", "manifest.webmanifest", "icone-192.png", "icone-512.png",
   "fontes/barlow-400.woff2", "fontes/barlow-600.woff2", "fontes/barlow-condensed-600.woff2", "fontes/barlow-condensed-700.woff2"];
 
