@@ -50,6 +50,28 @@ h2 { font-size: 1.35rem; margin-bottom: 8px; }
 .busca .fechar { background: transparent; color: var(--lago); border: 1.5px solid var(--lago); min-height: 40px; }
 .achados { margin-top: 10px; } .achados button { display: block; width: 100%; text-align: left; background: #F3F6F5; border: 0; border-radius: 10px; padding: 10px 12px; margin-top: 6px; min-height: 48px; }
 .achados b { display: block; font-weight: 600; } .achados span { font-size: 0.84rem; color: var(--tinta-fraca); }
+.aviso.alerta { background: #FBE3DC; border-left-color: var(--ferrugem); font-weight: 600; }
+.agenda .ag-topo { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.bt2 { border: 1.5px solid var(--lago); background: transparent; color: var(--lago); border-radius: 10px; padding: 0 14px; min-height: 40px; font-weight: 600; white-space: nowrap; }
+.link { background: none; border: 0; padding: 0; color: var(--lago); font-weight: 600; text-decoration: underline; min-height: 32px; }
+.mes { margin-top: 12px; } .mes > b { font-family: var(--titulo); font-size: 1.1rem; display: block; } .mes > b::first-letter { text-transform: uppercase; }
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 6px; text-align: center; }
+.cal .cs { font-size: 0.72rem; color: var(--tinta-fraca); }
+.cal .cd { min-height: 46px; border-radius: 8px; border: 0; background: #F3F6F5; padding: 2px 0; font-weight: 600; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.15; font-size: 0.9rem; }
+.cal .cd small { font-size: 0.66rem; font-weight: 400; }
+.cal .passado { color: #9AA8A2; background: transparent; font-weight: 400; }
+.cal .otimo { background: var(--otimo); color: #fff; } .cal .bom { background: var(--bom); } .cal .medio { background: var(--boia); } .cal .fraco { background: var(--ferrugem); color: #fff; }
+.cal .marcado { box-shadow: 0 0 0 3px var(--tinta); }
+.form label { display: block; margin-top: 10px; font-size: 0.9rem; font-weight: 600; }
+.form input[type=date], .form input[type=time], .form input[type=number], .form input[type=text] { display: block; width: 100%; font: inherit; font-weight: 400; padding: 9px 10px; border: 1.5px solid var(--linha); border-radius: 10px; min-height: 44px; margin-top: 4px; background: #fff; }
+.form .linha { display: flex; align-items: center; gap: 8px; font-weight: 400; margin-top: 12px; } .form .linha input { width: 20px; height: 20px; }
+.form button[type=submit] { margin-top: 14px; border: 0; background: var(--lago); color: #fff; border-radius: 10px; padding: 0 18px; min-height: 46px; font-weight: 600; }
+.form fieldset { border: 0; padding: 0; margin: 14px 0 0; min-width: 0; } .form legend { font-size: 0.9rem; font-weight: 600; padding: 0; margin-bottom: 6px; }
+.form .op { display: inline-block; margin: 0 6px 6px 0; font-weight: 400; } .form .op input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.op span { display: inline-block; border: 1.5px solid var(--lago); color: var(--lago); border-radius: 999px; padding: 7px 12px; font-size: 0.88rem; }
+.op input:checked + span { background: var(--lago); color: #fff; } .op input:focus-visible + span { outline: 3px solid var(--boia); outline-offset: 2px; }
+.como { margin: 8px 0 0; padding-left: 20px; } .como li { margin: 5px 0; font-size: 0.92rem; }
+.hist { margin: 10px 0 0; padding: 0; list-style: none; } .hist li { border-top: 1px solid var(--linha); padding: 8px 0; font-size: 0.9rem; }
 .aviso { background: #FFF6CC; border-left: 5px solid var(--boia); padding: 10px 12px; margin: 0 0 12px; font-size: 0.9rem; border-radius: 0 8px 8px 0; }
 .carregando { padding: 40px 0; text-align: center; color: var(--tinta-fraca); }
 .cartao { background: var(--papel); border: 1px solid var(--linha); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
@@ -186,8 +208,8 @@ td.sel, th.sel { background: #E9F1EE; font-weight: 600; }
 </head>
 <body>
 <div id="app"><header class="topo"><div class="dentro"><div class="marca"><h1>Dia de Pesca</h1></div><div class="abas"></div></div></header><main class="pagina"><p class="carregando">Buscando a previsão do tempo.</p></main></div>
-<script src="motor.js?v=8"></script>
-<script src="dicas.js?v=8"></script>
-<script src="app.js?v=8"></script>
+<script src="motor.js?v=9"></script>
+<script src="dicas.js?v=9"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>

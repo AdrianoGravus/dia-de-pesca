@@ -44,7 +44,7 @@
       var novo = []; c.alvos.forEach(function (id) { (ANTIGOS[id] || [id]).forEach(function (x) { if (novo.indexOf(x) < 0) novo.push(x); }); });
       c.alvos = novo;
     }
-    return { alvos: Array.isArray(c.alvos) ? c.alvos : M.ESPECIES.filter(function (e) { return e.alvo; }).map(function (e) { return e.id; }), motor: M.CONFIG_PADRAO };
+    return { alvos: Array.isArray(c.alvos) ? c.alvos : M.ESPECIES.filter(function (e) { return e.alvo; }).map(function (e) { return e.id; }), motor: motorCalibrado() };
   }
   estado.local = ler("pesca.local") || { modo: "gps" };   // "gps" ou "fixo" (pesqueiro escolhido na busca)
   function locaisRecentes() { var l = ler("pesca.locais"); return Array.isArray(l) ? l : []; }
@@ -154,6 +154,7 @@
       estado.aviso = r.antigo ? "Sem conexão. Mostrando a previsão guardada em " + quando(r.quando) + "." : "";
       recalcular();
       if (!estado.prox.length) throw new Error("sem dias");
+      conferirMarcados();
       estado.dia = estado.prox[0].data; estado.per = null;
       desenhar();
     }).catch(function (erro) {
@@ -171,7 +172,7 @@
       (p ? '<div class="local"><span>' + esc(onde) + '</span><button data-a="busca">Buscar pesqueiro</button>' +
         (p.origem === "fixo" ? '<button data-a="gps">Usar minha posição</button>' : '<button data-a="pos">Atualizar posição</button>') + '</div>' : '') +
       '<nav class="abas" aria-label="Telas"><button data-a="nav" data-v="dias"' + (aba === "dias" ? ' aria-current="page"' : '') + '>Dias</button>' +
-      '<button data-a="nav" data-v="especies"' + (aba === "especies" ? ' aria-current="page"' : '') + '>Espécies</button></nav></div></header>';
+      '<button data-a="nav" data-v="especies"' + (aba === "especies" ? ' aria-current="page"' : '') + '>Espécies</button><button data-a="nav" data-v="diario"' + (aba === "diario" ? ' aria-current="page"' : '') + '>Diário</button></nav></div></header>';
   }
   function painelBusca() {
     var b = estado.busca, rec = locaisRecentes(), h = '<section class="cartao busca"><h2>Buscar pesqueiro</h2>' +
@@ -187,6 +188,7 @@
   }
   function avisos() {
     var h = estado.busca.aberta ? painelBusca() : '';
+    (estado.alertas || []).forEach(function (t) { h += '<p class="aviso alerta">' + esc(t) + '</p>'; });
     if (estado.aviso) h += '<p class="aviso">' + esc(estado.aviso) + '</p>';
     if (estado.posicao.origem === "padrao" && !params.get("semgps")) h += '<p class="aviso">Não consegui ler a posição do aparelho. Usando ' + PADRAO.nome + '. Libere a localização para este site e toque em Atualizar posição, ou busque um pesqueiro.</p>';
     return h;
@@ -400,7 +402,7 @@
     var escolhidas = alvos();
     var bons = escolhidas.filter(function (e) { return r.ver[e.id] === "bom" || r.ver[e.id] === "otimo"; }).map(curto), fracos = escolhidas.filter(function (e) { return r.ver[e.id] === "fraco"; }).map(curto);
     var chuvaDia = d.chuvaPesca >= 1 ? " Chuva das 5h às 17h: " + Math.round(d.chuvaPesca) + " mm." : "";
-    var h = cabecalho("dias") + '<main class="pagina">' + avisos() + '<div class="grade"><div class="col-a">' +
+    var h = cabecalho("dias") + '<main class="pagina">' + avisos() + agenda() + '<div class="grade"><div class="col-a">' +
       '<section class="medida ' + r.medida + '"><div class="data">' + tituloDia(d) + '</div><div class="linha"><div class="palavra">' + MEDIDA[r.medida] + '</div><div class="num">' + Math.round(r.notaDia) + '<small>nota do dia</small></div></div>' +
       '<p>Melhor horário: <b>' + d.periodos[r.melhor].nome.toLowerCase() + ', das ' + d.periodos[r.melhor].faixa + '</b>.' + chuvaDia + '</p>' +
       (bons.length ? '<p>Bom para: <b>' + esc(lista(bons)) + '</b>.</p>' : '') + (fracos.length ? '<p>Fraco para: <b>' + esc(lista(fracos)) + '</b>.</p>' : '') + '</section>' +
@@ -453,11 +455,158 @@
     app.innerHTML = h;
   }
 
+  // ---------- diário: dias marcados, medições da água e registros de pescaria
+  function guardado(ch) { var l = ler(ch); return Array.isArray(l) ? l : []; }
+  function iso(d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function dataCurta(s) { var d = dataLocal(s); return SEM3[d.getDay()] + ", " + d.getDate() + "/" + (d.getMonth() + 1); }
+  function motorCalibrado() { var c = ler("pesca.calib") || {}, m = {}; for (var k in M.CONFIG_PADRAO) m[k] = M.CONFIG_PADRAO[k]; m.ajusteCima = +c.cima || 0; m.ajusteFundo = +c.fundo || 0; return m; }
+  function notaDe(data) { var r = estado.res[data]; return r ? { nota: Math.round(r.notaDia), medida: r.medida } : null; }
+  function brusca(a, b) { var d = Math.abs(a.nota - b.nota); return d >= 10 || (a.medida !== b.medida && d >= 5); }
+  function avisar(titulo, texto) {
+    try {
+      if ("Notification" in window && Notification.permission === "granted" && navigator.serviceWorker)
+        navigator.serviceWorker.ready.then(function (r) { r.showNotification(titulo, { body: texto, icon: "icone-192.png", tag: "pesca-mudanca" }); });
+    } catch (e) { /* sem avisos neste navegador */ }
+  }
+  function guardarParaFundo() { // cópia para a conferência com o aplicativo fechado, quando o celular permite
+    try {
+      if (!window.caches || !estado.posicao) return;
+      var dados = { lat: estado.posicao.lat, lon: estado.posicao.lon, alvos: alvos().map(function (e) { return e.id; }), ajusteCima: estado.cfg.motor.ajusteCima, ajusteFundo: estado.cfg.motor.ajusteFundo, ocultos: OCULTOS, marcados: guardado("pesca.marcados") };
+      caches.open("pesca-dados").then(function (c) { return c.put("marcado.json", new Response(JSON.stringify(dados), { headers: { "content-type": "application/json" } })); }).catch(function () {});
+    } catch (e) { /* segue sem a cópia */ }
+  }
+  function conferirMarcados(silencioso) {
+    var hoje = hojeISO(), lista = guardado("pesca.marcados"), mudou = false;
+    if (!silencioso) estado.alertas = [];
+    lista.forEach(function (m) {
+      if (m.data < hoje) return;
+      var cur = notaDe(m.data); if (!cur) return;
+      if (!m.visto || silencioso) { if (!m.base) m.base = cur; if (!m.visto && !silencioso) estado.alertas.push("Já existe previsão para " + dataCurta(m.data) + ", dia que você marcou: nota " + cur.nota + ", " + MEDIDA[cur.medida].toLowerCase() + "."); m.visto = cur; mudou = true; }
+      else if (brusca(m.visto, cur)) {
+        var t = "A previsão de " + dataCurta(m.data) + ", dia que você marcou, mudou bastante: a nota foi de " + m.visto.nota + " (" + MEDIDA[m.visto.medida].toLowerCase() + ") para " + cur.nota + " (" + MEDIDA[cur.medida].toLowerCase() + ").";
+        estado.alertas.push(t); avisar("Dia de Pesca: mudança no dia marcado", t); m.visto = cur; mudou = true;
+      }
+    });
+    if (mudou) gravar("pesca.marcados", lista);
+    guardarParaFundo();
+  }
+  function marcar(data) {
+    var lista = guardado("pesca.marcados"), k = -1; lista.forEach(function (m, i) { if (m.data === data) k = i; });
+    if (k >= 0) lista.splice(k, 1); else { var cur = notaDe(data); lista.push({ data: data, base: cur, visto: cur }); lista.sort(function (a, b) { return a.data < b.data ? -1 : 1; }); }
+    gravar("pesca.marcados", lista); guardarParaFundo();
+  }
+  function calendario() {
+    var hoje = hojeISO(), marc = guardado("pesca.marcados").map(function (m) { return m.data; }), base = dataLocal(hoje);
+    var h = '<p class="sub" style="margin:10px 0 0">Toque em um dia para marcar ou desmarcar. Os dias com previsão mostram a nota e a cor da medida.</p>';
+    for (var k = 0; k < 2; k++) {
+      var p = new Date(base.getFullYear(), base.getMonth() + k, 1), ult = new Date(p.getFullYear(), p.getMonth() + 1, 0).getDate();
+      h += '<div class="mes"><b>' + MESES[p.getMonth()] + ' de ' + p.getFullYear() + '</b><div class="cal">' + SEM1.map(function (x) { return '<span class="cs">' + x + '</span>'; }).join("");
+      for (var v = 0; v < p.getDay(); v++) h += '<span></span>';
+      for (var d = 1; d <= ult; d++) {
+        var s = iso(new Date(p.getFullYear(), p.getMonth(), d)), c = notaDe(s), m = marc.indexOf(s) >= 0;
+        h += s < hoje ? '<span class="cd passado">' + d + '</span>' :
+          '<button class="cd ' + (c ? c.medida : "") + (m ? " marcado" : "") + '" data-a="marcar" data-v="' + s + '" aria-pressed="' + m + '" aria-label="' + d + " de " + MESES[p.getMonth()] + (c ? ", nota " + c.nota : "") + (m ? ", marcado" : "") + '">' + (m ? "✓ " : "") + d + (c ? '<small>' + c.nota + '</small>' : '') + '</button>';
+      }
+      h += '</div></div>';
+    }
+    return h;
+  }
+  function avisosBotao() {
+    if (!("Notification" in window) || !navigator.serviceWorker) return '<p class="sub" style="margin:10px 0 0">Aberto deste jeito, o navegador não permite avisos. O aplicativo confere os dias marcados toda vez que é aberto e mostra a mudança aqui no topo.</p>';
+    if (Notification.permission === "granted") return '<p class="sub" style="margin:10px 0 0">Avisos ativados. A conferência certa acontece quando você abre o aplicativo. Com ele fechado, é o celular que decide se e quando deixa conferir.</p>';
+    return '<p style="margin:10px 0 0"><button class="bt2" data-a="notificar">Ativar avisos no celular</button></p><p class="sub" style="margin:6px 0 0">Sem os avisos, a mudança aparece aqui no topo quando você abrir o aplicativo.</p>';
+  }
+  function ativarAvisos() {
+    Notification.requestPermission().then(function (p) {
+      if (p === "granted") navigator.serviceWorker.ready.then(function (r) { if (r.periodicSync) r.periodicSync.register("conferir-pescaria", { minInterval: 12 * 3600 * 1000 }).catch(function () {}); });
+      desenhar(true);
+    });
+  }
+  function agenda() {
+    var hoje = hojeISO(), lista = guardado("pesca.marcados"), fut = lista.filter(function (m) { return m.data >= hoje; }), reg = guardado("pesca.registros");
+    var pend = lista.filter(function (m) { return m.data <= hoje && !reg.some(function (r) { return r.data === m.data; }); }).slice(-1)[0];
+    var h = '<section class="cartao agenda"><div class="ag-topo"><div><b>' + (fut.length ? "Pescaria marcada: " + fut.map(function (m) { var c = notaDe(m.data); return dataCurta(m.data) + (c ? " (nota " + c.nota + ", " + MEDIDA[c.medida].toLowerCase() + ")" : " (ainda sem previsão)"); }).join("; ") : "Nenhuma pescaria marcada") + '</b></div>' +
+      '<button class="bt2" data-a="cal">' + (estado.calAberto ? "Fechar" : "Calendário") + '</button></div>';
+    if (pend) h += '<p style="margin:8px 0 0">Você marcou pesca em ' + dataCurta(pend.data) + '. <button class="link" data-a="registrar" data-v="' + pend.data + '">Registrar como foi</button></p>';
+    if (estado.calAberto) h += calendario() + avisosBotao();
+    return h + '</section>';
+  }
+  function estimativa(data, hora) {
+    var d = estado.dias.filter(function (x) { return x.data === data; })[0]; if (!d) return null;
+    var hh = parseInt(hora, 10), k = hh < 8 ? 0 : hh < 11 ? 1 : hh < 14 ? 2 : 3, p = d.periodos[Math.min(k, d.periodos.length - 1)];
+    return { cima: +p.tCima.toFixed(1), fundo: +p.tFundo.toFixed(1) };
+  }
+  function calibrar() {
+    var ms = guardado("pesca.medicoes").filter(function (m) { return m.est; }), dc = [], df = [];
+    ms.forEach(function (m) { if (typeof m.cima === "number") dc.push(m.cima - m.est.cima); if (typeof m.fundo === "number") df.push(m.fundo - m.est.fundo); });
+    function media(v) { return v.reduce(function (a, b) { return a + b; }, 0) / v.length; }
+    function lim(v) { return Math.max(-8, Math.min(8, +v.toFixed(1))); }
+    // com poucas medições aplica só parte da diferença: metade com uma, dois terços com duas, 80% com quatro
+    var c = dc.length ? lim(media(dc) * dc.length / (dc.length + 1)) : 0, f = df.length ? lim(media(df) * df.length / (df.length + 1)) : c;
+    gravar("pesca.calib", { cima: c, fundo: f, n: ms.length });
+    estado.cfg.motor = motorCalibrado(); recalcular(); conferirMarcados(true); // a calibração muda as notas: não tratar como mudança de previsão
+  }
+  function resumoApp(data) {
+    var d = estado.dias.filter(function (x) { return x.data === data; })[0]; if (!d) return null;
+    var r = resumir(d);
+    return { nota: Math.round(r.notaDia), medida: r.medida, melhor: r.melhor, bons: alvos().filter(function (e) { return r.ver[e.id] === "bom" || r.ver[e.id] === "otimo"; }).map(function (e) { return e.id; }) };
+  }
+  function telaDiario() {
+    var hoje = hojeISO(), agora = new Date(), hhmm = String(agora.getHours()).padStart(2, "0") + ":" + String(agora.getMinutes()).padStart(2, "0");
+    var meds = guardado("pesca.medicoes"), regs = guardado("pesca.registros"), cal = ler("pesca.calib") || { cima: 0, fundo: 0, n: 0 }, dataReg = estado.dataRegistro || hoje;
+    var P = (estado.prox[0] || estado.dias[0]).periodos, msg = estado.msg; estado.msg = "";
+    function sinal(v) { return (v > 0 ? "+" : "") + n1(v); }
+    function grupo(titulo, nome, tipo, ops, obrig) {
+      return '<fieldset><legend>' + titulo + '</legend>' + ops.map(function (o) { return '<label class="op"><input type="' + tipo + '" name="' + nome + '" value="' + o[0] + '"' + (obrig ? " required" : "") + '><span>' + esc(o[1]) + '</span></label>'; }).join("") + '</fieldset>';
+    }
+    var como = ["Use um termômetro digital com sonda e fio, de aquário ou de cozinha, com fio de pelo menos 4 m para alcançar o fundo. Termômetro de vidro ou de infravermelho não serve para o fundo.",
+      "Antes de salvar, deixe o aplicativo no lugar do pesqueiro, pelo GPS ou pela busca. A comparação é com a estimativa daquele lugar.",
+      "Meça no ponto onde você pesca, longe da margem rasa, da entrada de água e do aerador.",
+      "Em cima: sonda a um palmo e meio da superfície, uns 30 cm, na sombra do seu corpo. Espere o número parar de mudar, de um a dois minutos.",
+      "No fundo: prenda uma chumbada perto da sonda, desça até tocar o fundo, suba um palmo e espere dois minutos antes de ler.",
+      "Informe a hora certa da leitura. A água de cima muda bastante ao longo do dia.",
+      "O ideal são duas medições no mesmo dia: uma cedo, até 8h, e outra à tarde, entre 14h e 16h.",
+      "Repita em dias diferentes: um frio, um quente e um depois de chuva forte. Com quatro ou cinco medições o desvio médio já fica bem corrigido.",
+      "Marque se o aerador estava ligado. Ele mistura o lago e muda a diferença entre cima e fundo."];
+    var comp = regs.filter(function (r) { return r.app && r.geral !== 3; }), ok = comp.filter(function (r) { return (r.geral >= 4) === (r.app.medida === "bom" || r.app.medida === "otimo"); }).length;
+    var ordem = M.ESPECIES.slice().sort(function (a, b) { return ehAlvo(b) - ehAlvo(a); });
+    var h = cabecalho("diario") + '<main class="pagina diario">' + avisos() + (msg ? '<p class="aviso">' + esc(msg) + '</p>' : '') + '<div class="grade"><div class="col-a">' +
+      '<section class="cartao"><h2>Medir a temperatura da água</h2><p class="sub">Cada medição corrige a estimativa do aplicativo. A diferença média entre o medido e o estimado passa a ser somada em todas as notas. Com poucas medições entra só parte dela: metade com uma, dois terços com duas, 80% com quatro.</p>' +
+      '<details><summary style="font-size:1.05rem">Como medir para a calibração ficar boa</summary><ol class="como">' + como.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("") + '</ol></details>' +
+      '<form data-f="medicao" class="form"><label>Dia<input type="date" name="data" value="' + hoje + '" max="' + hoje + '" required></label>' +
+      '<label>Hora da leitura<input type="time" name="hora" value="' + hhmm + '" required></label>' +
+      '<label>Temperatura em cima (°C)<input type="number" name="cima" step="0.1" min="5" max="40" inputmode="decimal" required></label>' +
+      '<label>Temperatura no fundo (°C), se medir<input type="number" name="fundo" step="0.1" min="5" max="40" inputmode="decimal"></label>' +
+      '<label class="linha"><input type="checkbox" name="aerador" value="1"> Aerador ligado</label><button type="submit">Salvar medição</button></form>' +
+      '<p style="margin:14px 0 0"><b style="font-weight:600">Ajuste em uso:</b> ' + (cal.n ? sinal(cal.cima) + " °C em cima e " + sinal(cal.fundo) + " °C no fundo, a partir de " + cal.n + (cal.n > 1 ? " medições." : " medição.") : "nenhum. Ainda não há medição que possa ser comparada.") + '</p>' +
+      (meds.length ? '<ul class="hist">' + meds.map(function (m, i) {
+        return '<li>' + dataCurta(m.data) + ", " + esc(m.hora) + ": em cima " + n1(m.cima) + (m.est ? " (estimado " + n1(m.est.cima) + ")" : "") + (typeof m.fundo === "number" ? ", no fundo " + n1(m.fundo) + (m.est ? " (estimado " + n1(m.est.fundo) + ")" : "") : "") + (m.est ? "" : ". Sem estimativa para comparar") + '. <button class="link" data-a="apagarmed" data-v="' + i + '">Apagar</button></li>'; }).reverse().join("") + '</ul>' : '') +
+      '</section></div><div class="col-b"><section class="cartao"><h2>Como foi a pescaria</h2><p class="sub">Responda depois de pescar. O aplicativo guarda a sua resposta ao lado da nota que ele deu para o dia.</p>' +
+      '<form data-f="registro" class="form"><label>Dia da pescaria<input type="date" name="data" value="' + dataReg + '" max="' + hoje + '" required></label>' +
+      grupo("Como foi o dia no geral?", "geral", "radio", [["1", "Péssimo"], ["2", "Fraco"], ["3", "Médio"], ["4", "Bom"], ["5", "Excelente"]], true) +
+      grupo("Em que horários teve mais ação?", "horas", "checkbox", P.map(function (p, k) { return [String(k), p.faixa]; }).concat([["nenhum", "Quase sem ação"]])) +
+      grupo("Quais espécies saíram?", "especies", "checkbox", ordem.map(function (e) { return [e.id, e.nome]; })) +
+      grupo("Onde os peixes pegaram?", "onde", "checkbox", [["sup", "Superfície"], ["meia", "Meia-água"], ["fundo", "Fundo"], ["raso", "Margens"]]) +
+      '<label>Qual isca funcionou melhor?<input type="text" name="isca" maxlength="80" autocomplete="off"></label>' +
+      grupo("Como estava o movimento no lago?", "movimento", "radio", [["vazio", "Vazio"], ["normal", "Normal"], ["cheio", "Cheio"]]) +
+      grupo("O aerador estava ligado?", "aerador", "radio", [["sim", "Sim"], ["nao", "Não"], ["naosei", "Não sei"]]) +
+      '<button type="submit">Salvar registro</button></form></section>' +
+      '<section class="cartao"><h2>Suas pescarias e o acerto do aplicativo</h2>' +
+      (regs.length ? '<p style="margin:0">' + (comp.length ? "O aplicativo concordou com você em " + ok + " de " + comp.length + (comp.length > 1 ? " pescarias" : " pescaria") + ", sem contar as de nota 3. " : "") + "Registros: " + regs.length + ". Com 10 ou mais já dá para começar a ajustar os pesos da nota com segurança.</p>" +
+        '<ul class="hist">' + regs.map(function (r, i) {
+          var nomes = (r.especies || []).map(function (id) { var e = especie(id); return e ? e.nome.toLowerCase() : id; });
+          return '<li><b style="font-weight:600">' + dataCurta(r.data) + '</b>: você deu ' + r.geral + ' de 5. ' + (r.app ? "Aplicativo: nota " + r.app.nota + ", " + MEDIDA[r.app.medida].toLowerCase() + ". " : "Sem nota do aplicativo para esse dia. ") +
+            (nomes.length ? "Saíram: " + esc(lista(nomes)) + ". " : "") + (r.isca ? "Isca: " + esc(r.isca) + ". " : "") + '<button class="link" data-a="apagarreg" data-v="' + i + '">Apagar</button></li>'; }).join("") + '</ul>'
+        : '<p style="margin:0">Nenhum registro ainda. Cada registro mostra se a nota do aplicativo bateu com o seu dia.</p>') +
+      '</section></div></div>' + rodape() + '</main>';
+    app.innerHTML = h;
+  }
+
   // ---------- navegação e toques
   function desenhar(manterRolagem) {
     var y = window.scrollY, m = location.hash.match(/^#especie-([a-z]+)$/), e = m && especie(m[1]);
     if (!estado.prox.length) return;
-    if (e) { estado.esp = e.id; telaEspecie(e); } else telaDias();
+    if (location.hash === "#diario") telaDiario(); else if (e) { estado.esp = e.id; telaEspecie(e); } else telaDias();
     window.scrollTo(0, manterRolagem ? y : 0);
     var sel = app.querySelector('.troca [aria-pressed="true"]'); if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: "nearest", inline: "center" });
   }
@@ -468,7 +617,7 @@
     if (a === "dia") { estado.dia = v; estado.per = null; desenhar(true); }
     else if (a === "per") { estado.per = +v; desenhar(true); }
     else if (a === "esp") { if (location.hash === "#especie-" + v) return; location.hash = "especie-" + v; }
-    else if (a === "nav") { location.hash = v === "especies" ? "especie-" + (estado.esp || alvos()[0].id) : "dias"; }
+    else if (a === "nav") { location.hash = v === "especies" ? "especie-" + (estado.esp || alvos()[0].id) : v === "diario" ? "diario" : "dias"; }
     else if (a === "alvo") {
       var k = estado.cfg.alvos.indexOf(v); if (k >= 0) estado.cfg.alvos.splice(k, 1); else estado.cfg.alvos.push(v);
       salvarCfg(); recalcular(); desenhar(true);
@@ -477,13 +626,34 @@
     else if (a === "local") usarLocal(estado.busca.itens[+v]);
     else if (a === "recente") { var rr = locaisRecentes()[+v]; usarLocal({ lat: rr.lat, lon: rr.lon, nome: rr.nome, onde: "" }); }
     else if (a === "gps") { estado.local = { modo: "gps" }; gravar("pesca.local", estado.local); gravar("pesca.dados", null); app.innerHTML = cabecalho("") + '<main class="pagina"><p class="carregando">Lendo a posição do aparelho.</p></main>'; iniciar(); }
+    else if (a === "cal") { estado.calAberto = !estado.calAberto; desenhar(true); }
+    else if (a === "marcar") { marcar(v); desenhar(true); }
+    else if (a === "notificar") ativarAvisos();
+    else if (a === "registrar") { estado.dataRegistro = v; location.hash = "diario"; }
+    else if (a === "apagarmed") { var lm = guardado("pesca.medicoes"); lm.splice(+v, 1); gravar("pesca.medicoes", lm); calibrar(); desenhar(true); }
+    else if (a === "apagarreg") { var lr = guardado("pesca.registros"); lr.splice(+v, 1); gravar("pesca.registros", lr); desenhar(true); }
     else if (a === "pos") { gravar("pesca.dados", null); app.innerHTML = cabecalho("") + '<main class="pagina"><p class="carregando">Lendo a posição do aparelho.</p></main>'; iniciar(); }
     else if (a === "recarregar") location.reload();
   });
 
   app.addEventListener("submit", function (ev) {
-    var f = ev.target.closest("[data-f=busca]"); if (!f) return;
-    ev.preventDefault(); buscar(f.querySelector("input").value);
+    var f = ev.target.closest("[data-f]"); if (!f) return;
+    ev.preventDefault();
+    var tipo = f.dataset.f, fd = new FormData(f);
+    if (tipo === "busca") return buscar(f.querySelector("input").value);
+    if (tipo === "medicao") {
+      var m = { data: fd.get("data"), hora: fd.get("hora"), cima: parseFloat(fd.get("cima")), fundo: fd.get("fundo") ? parseFloat(fd.get("fundo")) : null, aerador: !!fd.get("aerador"), est: estimativa(fd.get("data"), fd.get("hora")) };
+      if (!isFinite(m.cima)) return;
+      var l = guardado("pesca.medicoes"); l.push(m); gravar("pesca.medicoes", l); calibrar();
+      estado.msg = m.est ? "Medição salva e usada na calibração." : "Medição salva, mas o aplicativo não tem estimativa para esse dia neste lugar. Ela não entra na calibração.";
+      return desenhar(true);
+    }
+    if (tipo === "registro") {
+      var r = { data: fd.get("data"), geral: +fd.get("geral"), horas: fd.getAll("horas"), especies: fd.getAll("especies"), onde: fd.getAll("onde"), isca: String(fd.get("isca") || "").slice(0, 80), movimento: fd.get("movimento") || "", aerador: fd.get("aerador") || "", app: resumoApp(fd.get("data")) };
+      if (!r.geral) { estado.msg = "Escolha como foi o dia no geral."; return desenhar(true); }
+      var g = guardado("pesca.registros").filter(function (x) { return x.data !== r.data; }); g.push(r); g.sort(function (a, b) { return a.data < b.data ? 1 : -1; });
+      gravar("pesca.registros", g); estado.dataRegistro = null; estado.msg = "Registro salvo."; return desenhar(true);
+    }
   });
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
     navigator.serviceWorker.register("sw.js").catch(function () { /* sem modo offline */ });
